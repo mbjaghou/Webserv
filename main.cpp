@@ -6,41 +6,95 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 15:32:23 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/03 17:25:21 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/08 19:37:40 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
-int main(int ac, char **av)
+#include <sys/select.h>
+ #include <fcntl.h>
+int main()
 {
     server serv;
-    
-    if (serv.socket_server())
-        exit (1);
+    serv.socket_server_start();
 
-    serv.addr.sin_family = AF_INET;
-    serv.addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv.addr.sin_port = htons(PORT);
-    memset(serv.addr.sin_zero, '\0', sizeof serv.addr.sin_zero);
-
-    if (serv.bind_server())
-        exit (1);
-    if (serv.lesten_server())
-        exit (1);
+    int connection[MAX_CONNECTION];
+    fd_set read_fd;
+    for(int i = 0; i < MAX_CONNECTION; i++)
+        connection[i] = -1;
+    connection[0] = serv.server_socket;
     while (1)
     {
-        char buffer[80000];
-        if (serv.accept_server())
-            exit(1);
-        if (serv.read_server(buffer))
-            exit (1);
-
+        int i;
+        char buffer[BUFFER];
+        FD_ZERO(&read_fd);
+        for (i = 0; i < MAX_CONNECTION; i++ )
+        {
+            if (connection[i] >= 0)
+                FD_SET(connection[i], &read_fd);
+        }
+        int select_fd = select(FD_SETSIZE, &read_fd, NULL, NULL, NULL);
+        if (select_fd >= 0)
+        {
+            if (FD_ISSET(serv.server_socket, &read_fd))
+            {
+                if (!serv.accept_server())
+                {
+                    for (i = 0; i < MAX_CONNECTION; i++)
+                    {
+                        if (connection[i] < 0)
+                        {
+                            connection[i] = serv.server_accept;
+                            i = MAX_CONNECTION;
+                        }
+                            
+                    }
+                }
+            select_fd--;
+            if (!select_fd)
+                continue;
+            }
+            // std::cout << "test\n";
+            for (i=1;i < MAX_CONNECTION;i++) {
+                 if ((connection[i] > 0) &&
+                     (FD_ISSET(connection[i], &read_fd))) {
+                     /* read incoming data */   
+                    //  printf("Returned fd is %d [index, i: %d]\n", connection[i], i);
+                     select_fd = recv(connection[i], buffer, BUFFER, 0);
+                     if (select_fd == 0) {
+                         printf("Closing connection for fd:%d\n", connection[i]);
+                         close(connection[i]);
+                         connection[i] = -1; /* Connection is now closed */
+                     } 
+                     if (select_fd > 0) { 
+                        // std::cout << "test\n"; 
+                        //  printf("Received data (len %d bytes, fd: %d): %s\n", 
+                        //      select_fd, connection[i], buffer);
+                     } 
+                     if (select_fd == -1) {
+                         printf("recv() failed for fd: %d [%s]\n", 
+                             connection[i], strerror(errno));
+                         break;
+                     }
+                 }
+                 select_fd--;
+                 if (!select_fd) continue;
+             }
+        }
+        else 
+        {
+            std::cout << "hello\n";
+        }
         printf("%s\n ", buffer);
-        //response
-        char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nLife is Life";
+        serv.read_server(buffer);
+        const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 13\n\nLife 888 Life";
         write(serv.server_accept , hello , strlen(hello));
-        close(serv.server_accept);
     }
+        for (int i = 0; i < MAX_CONNECTION; i++)
+        {
+            if (connection[i] > 0)
+                close(connection[i]);
+        }
     return (0);
 }

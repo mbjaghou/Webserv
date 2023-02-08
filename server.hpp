@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/03 17:26:17 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/08 19:06:29 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #define SERVER_HPP
 
 #define PORT 8080
+#define MAX_CONNECTION 50
+#define BUFFER 80000
 
 #include <iostream>
 #include <sys/socket.h>
@@ -22,6 +24,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <sys/select.h>
+ #include <fcntl.h>
 class server
 {
     private:
@@ -31,7 +35,7 @@ class server
     ~server();
     struct sockaddr_in addr;
     void close(void);
-    int socket_server(void);
+    int socket_server_start(void);
     int read_server(char buffer[80000]);
     int server_socket;
     int server_bind;

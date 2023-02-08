@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/03 17:24:14 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/08 19:09:46 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,10 @@ server::server()
 server::~server()
 {
     std::cout << "God bye \n";
+    close();
 }
 
-int server::socket_server(void)
+int server::socket_server_start(void)
 {
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket < 0)
@@ -46,12 +47,15 @@ int server::socket_server(void)
         close();
         return 1;
     }
-    int enable = 1;
-    if (setsockopt(this->server_socket , SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) == -1)
-    {
-        std::cerr << " setsockopt : " << strerror(errno) << '\n';
-        exit(1);
-    }
+    int i = 1;
+    setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
+    // fcntl(server_socket, F_SETFL, O_NONBLOCK);
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(PORT);
+    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
+    bind_server();
+    lesten_server();
     return (0);
 }
 int server::bind_server(void)
@@ -95,9 +99,9 @@ void server::close(void)
     ::close(server_accept);
 }
 
-int server::read_server(char buffer[80000])
+int server::read_server(char buffer[BUFFER])
 {
-    server_read = read(server_accept , buffer, 80000);
+    server_read = read(server_accept , buffer, BUFFER);
     if (server_read < 0)
     {
         std::cout << std::strerror(errno);
