@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 15:32:23 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/08 19:37:40 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/09 15:22:04 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,9 @@ int main()
                          connection[i] = -1; /* Connection is now closed */
                      } 
                      if (select_fd > 0) { 
-                        // std::cout << "test\n"; 
-                        //  printf("Received data (len %d bytes, fd: %d): %s\n", 
-                        //      select_fd, connection[i], buffer);
+                        std::cout << "test\n"; 
+                         printf("Received data (len %d bytes, fd: %d): \n%s\n", 
+                             select_fd, connection[i], buffer);
                      } 
                      if (select_fd == -1) {
                          printf("recv() failed for fd: %d [%s]\n", 

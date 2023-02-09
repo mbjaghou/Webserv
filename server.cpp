@@ -6,26 +6,11 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/08 19:09:46 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/09 21:21:13 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
-
-// struct socklen_t   addrlen;
-
-//int bind(int socket, const struct sockaddr *address, socklen_t address_len);
-/* htonl converts a long integer (e.g. address) to a network representation */ 
-/* htons converts a short integer (e.g. port) to a network representation */ 
-
-// struct sockaddr_in 
-// { 
-//     __uint8_t         sin_len; 
-//     sa_family_t       sin_family; 
-//     in_port_t         sin_port; 
-//     struct in_addr    sin_addr; 
-//     char              sin_zero[8]; 
-// };
 
 server::server()
 {
