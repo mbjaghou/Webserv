@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/10 14:37:11 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/10 16:44:08 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,21 +77,12 @@ int server::accept_server(void)
 
 int server::close(void)
 {
+    std::cout << "rest\n";
     ::close(server_socket);
     ::close(server_accept);
     return (1);
 }
 
-int server::read_server(char buffer[BUFFER])
-{
-    server_read = read(server_accept , buffer, BUFFER);
-    if (server_read < 0)
-    {
-        std::cout << std::strerror(errno);
-        close();
-    }
-    return (0);
-}
 int server::select_socket(fd_set read_fd)
 {
     server_select = select(FD_SETSIZE, &read_fd, NULL, NULL, NULL);
@@ -112,4 +103,77 @@ ssize_t server::send_client(const char *str)
     }
     return (0);
 
+}
+
+void server::start_server()
+{
+    fd_set read_fd;
+    char buffer[BUFFER];
+    const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
+    int i;
+
+    socket_server_start();
+    for(int i = 0; i < MAX_CONNECTION; i++)
+        connection[i] = -1;
+    
+    connection[0] = server_socket;
+    while (1)
+    {
+        FD_ZERO(&read_fd);
+        for (i = 0; i < MAX_CONNECTION;++i)
+        {
+            if (connection[i] >= 0)
+                FD_SET(connection[i], &read_fd);
+        }
+        if (!select_socket(read_fd))
+        {
+            if (FD_ISSET(server_socket, &read_fd))
+            {
+                if(!accept_server())
+                {
+                    send_client(hello);
+                    for (i = 0; i < MAX_CONNECTION; ++i)
+                    {
+                        if (connection[i] < 0)
+                        {
+                            connection[i] = server_accept;
+                            break ;
+                        }
+                    }
+                }
+               
+            }
+            for (i = 1; i < MAX_CONNECTION; ++i)
+            {
+                
+                if (connection[i] > 0 && FD_ISSET(connection[i], &read_fd))
+                {
+                    server_recv = recv(connection[i], buffer, BUFFER, 0);
+                    if (server_recv == 0)
+                    {
+                        ::close(connection[i]);
+                        FD_CLR(connection[i], &read_fd);
+                        std::cout << "\n=======================shutdown====================\n";
+                        connection[i] = -1;
+                    }
+                    if (server_recv > 0)
+                    {
+                        printf("%s", buffer);
+                    }
+                    if (server_recv == -1)
+                    {
+                        std::cout << std::strerror(errno);
+                        break;
+                    }
+                }
+            }
+        }
+        
+    }
+
+    for (int i = 0; i < MAX_CONNECTION; i++)
+    {
+        if (connection[i] > 0)
+            ::close(connection[i]);
+    }
 }
