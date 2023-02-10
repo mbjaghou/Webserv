@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/09 21:21:13 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/10 14:37:11 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ int server::socket_server_start(void)
     {
         std::cout << std::strerror(errno);
         close();
-        return 1;
     }
     int i = 1;
     setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
@@ -50,18 +49,16 @@ int server::bind_server(void)
     {
         std::cout << std::strerror(errno);
         close();
-        return 1;
     }
     return (0);
 }
 int server::lesten_server(void)
 {
-    server_lesten = listen(server_socket, 10);
+    server_lesten = listen(server_socket, 3);
     if (server_lesten < 0)
     {
         std::cout << std::strerror(errno);
         close();
-        return 1;
     }
     return (0);
 }
@@ -78,10 +75,11 @@ int server::accept_server(void)
     return (0);
 }
 
-void server::close(void)
+int server::close(void)
 {
     ::close(server_socket);
     ::close(server_accept);
+    return (1);
 }
 
 int server::read_server(char buffer[BUFFER])
@@ -91,7 +89,27 @@ int server::read_server(char buffer[BUFFER])
     {
         std::cout << std::strerror(errno);
         close();
-        return 1;
     }
     return (0);
+}
+int server::select_socket(fd_set read_fd)
+{
+    server_select = select(FD_SETSIZE, &read_fd, NULL, NULL, NULL);
+    if (server_select < 0)
+    {
+        std::cout << std::strerror(errno);
+        close();
+    }
+    return (0);
+}
+ssize_t server::send_client(const char *str)
+{
+    server_send = send(server_accept, str, strlen(str), 0);
+    if (server_send < 0)
+    {
+        std::cout << std::strerror(errno);
+        close();
+    }
+    return (0);
+
 }

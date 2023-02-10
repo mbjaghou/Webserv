@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/08 19:06:29 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/10 14:24:54 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #define PORT 8080
 #define MAX_CONNECTION 50
-#define BUFFER 80000
+#define BUFFER 1024
 
 #include <iostream>
 #include <sys/socket.h>
@@ -34,9 +34,9 @@ class server
     server();
     ~server();
     struct sockaddr_in addr;
-    void close(void);
+    int close(void);
     int socket_server_start(void);
-    int read_server(char buffer[80000]);
+    int read_server(char buffer[BUFFER]);
     int server_socket;
     int server_bind;
     int bind_server(void);
@@ -45,6 +45,12 @@ class server
     int server_accept;
     int accept_server(void);
     long server_read;
+    int connection[MAX_CONNECTION];
+    int server_select;
+    int select_socket(fd_set read_fd);
+    ssize_t send_client(const char *str);
+    ssize_t server_send;
+    ssize_t server_recv;
 
 };
 #endif
