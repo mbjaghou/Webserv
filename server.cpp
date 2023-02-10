@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/10 16:44:08 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/10 18:53:55 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,6 @@ server::~server()
     close();
 }
 
-int server::socket_server_start(void)
-{
-    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket < 0)
-    {
-        std::cout << std::strerror(errno);
-        close();
-    }
-    int i = 1;
-    setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
-    // fcntl(server_socket, F_SETFL, O_NONBLOCK);
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(PORT);
-    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
-    bind_server();
-    lesten_server();
-    return (0);
-}
 int server::bind_server(void)
 {
     server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr));
@@ -77,7 +58,6 @@ int server::accept_server(void)
 
 int server::close(void)
 {
-    std::cout << "rest\n";
     ::close(server_socket);
     ::close(server_accept);
     return (1);
@@ -105,10 +85,31 @@ ssize_t server::send_client(const char *str)
 
 }
 
+
+int server::socket_server_start(void)
+{
+    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket < 0)
+    {
+        std::cout << std::strerror(errno);
+        close();
+    }
+    int i = 1;
+    setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
+    // fcntl(server_socket, F_SETFL, O_NONBLOCK);
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(PORT);
+    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
+    bind_server();
+    lesten_server();
+    return (0);
+}
+
 void server::start_server()
 {
     fd_set read_fd;
-    char buffer[BUFFER];
+
     const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
     int i;
 
@@ -170,7 +171,6 @@ void server::start_server()
         }
         
     }
-
     for (int i = 0; i < MAX_CONNECTION; i++)
     {
         if (connection[i] > 0)

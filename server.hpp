@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/10 16:45:15 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/10 18:04:03 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,17 @@
 class server
 {
     private:
+        //attrbuite
+        struct sockaddr_in addr;
+        int server_socket;
+        int server_bind;
+        int server_lesten;
+        int server_accept;
+        int connection[MAX_CONNECTION];
+        int server_select;
+        ssize_t server_send;
+        ssize_t server_recv;
+        char buffer[BUFFER];
         
     public:
         //membre fuction
@@ -42,17 +53,5 @@ class server
         int select_socket(fd_set read_fd);
         ssize_t send_client(const char *str);
         void start_server();
-        
-        //attrbuite
-        struct sockaddr_in addr;
-        int server_socket;
-        int server_bind;
-        int server_lesten;
-        int server_accept;
-        int connection[MAX_CONNECTION];
-        int server_select;
-        ssize_t server_send;
-        ssize_t server_recv;
-
 };
 #endif
