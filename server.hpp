@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/10 18:04:03 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/11 14:38:59 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 #define SERVER_HPP
 
 #define PORT 8080
-#define MAX_CONNECTION 10
-#define BUFFER 1024
+#define MAX_CONNECTION 50
+#define BUFFER 999999
 
 #include <iostream>
 #include <sys/socket.h>

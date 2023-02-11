@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/10 18:53:55 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/11 16:39:26 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int server::bind_server(void)
 }
 int server::lesten_server(void)
 {
-    server_lesten = listen(server_socket, 3);
+    server_lesten = listen(server_socket, 10);
     if (server_lesten < 0)
     {
         std::cout << std::strerror(errno);
@@ -96,7 +96,7 @@ int server::socket_server_start(void)
     }
     int i = 1;
     setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
-    // fcntl(server_socket, F_SETFL, O_NONBLOCK);
+    //fcntl(server_socket, F_SETFL, O_NONBLOCK);
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(PORT);
@@ -132,7 +132,6 @@ void server::start_server()
             {
                 if(!accept_server())
                 {
-                    send_client(hello);
                     for (i = 0; i < MAX_CONNECTION; ++i)
                     {
                         if (connection[i] < 0)
@@ -145,21 +144,19 @@ void server::start_server()
                
             }
             for (i = 1; i < MAX_CONNECTION; ++i)
-            {
-                
+            {   
                 if (connection[i] > 0 && FD_ISSET(connection[i], &read_fd))
                 {
                     server_recv = recv(connection[i], buffer, BUFFER, 0);
                     if (server_recv == 0)
                     {
                         ::close(connection[i]);
-                        FD_CLR(connection[i], &read_fd);
                         std::cout << "\n=======================shutdown====================\n";
                         connection[i] = -1;
                     }
                     if (server_recv > 0)
                     {
-                        printf("%s", buffer);
+                        write(1,buffer,strlen(buffer));
                     }
                     if (server_recv == -1)
                     {
@@ -169,7 +166,7 @@ void server::start_server()
                 }
             }
         }
-        
+        send_client(hello);
     }
     for (int i = 0; i < MAX_CONNECTION; i++)
     {
