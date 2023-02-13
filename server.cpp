@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/13 13:16:53 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/13 17:37:02 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int server::bind_server(void)
 
 int server::lesten_server(void)
 {
-    server_lesten = listen(server_socket, 10);
+    server_lesten = listen(server_socket, SOMAXCONN);
     if (server_lesten < 0)
     {
         std::cout << std::strerror(errno);
@@ -171,6 +171,9 @@ void server::start_server()
     for (int i = 0; i < MAX_CONNECTION; i++)
     {
         if (connection[i] > 0)
+        {
+            FD_CLR(connection[i], &read_fd);
             ::close(connection[i]);
+        }
     }
 }
