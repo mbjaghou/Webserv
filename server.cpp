@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/11 16:39:26 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/13 13:16:53 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ int server::bind_server(void)
     }
     return (0);
 }
+
 int server::lesten_server(void)
 {
     server_lesten = listen(server_socket, 10);
@@ -85,7 +86,6 @@ ssize_t server::send_client(const char *str)
 
 }
 
-
 int server::socket_server_start(void)
 {
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -96,7 +96,7 @@ int server::socket_server_start(void)
     }
     int i = 1;
     setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
-    //fcntl(server_socket, F_SETFL, O_NONBLOCK);
+    // fcntl(server_socket, F_SETFL, O_NONBLOCK);
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(PORT);

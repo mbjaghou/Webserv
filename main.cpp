@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 15:32:23 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/10 19:42:13 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/12 20:30:56 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,16 @@
 
 int main()
 {
-    server serv;
-    serv.start_server();
+    try 
+    {
+        server serv;
+        serv.start_server();
+        
+    }
+    catch(...)
+    {
+        std::cout << "Error\n";
+        exit(1);
+    }
     return (0);
 }
