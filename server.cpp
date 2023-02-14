@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/13 17:37:02 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/14 16:05:41 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int server::accept_server(void)
     server_accept = accept(server_socket, (struct sockaddr *)&addr, (socklen_t*)&addrlen);
     if (server_accept < 0)
     {
+        std::cout << "\n\n============================\n\n\n";
         std::cout << std::strerror(errno);
         close();
         return 1;
@@ -96,7 +97,7 @@ int server::socket_server_start(void)
     }
     int i = 1;
     setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
-    // fcntl(server_socket, F_SETFL, O_NONBLOCK);
+    // fcntl(server_socket, F_SETFL, O_NONBLOCK);   
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(PORT);
@@ -128,6 +129,7 @@ void server::start_server()
         }
         if (!select_socket(read_fd))
         {
+            // setsockopt(server_accept , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
             if (FD_ISSET(server_socket, &read_fd))
             {
                 if(!accept_server())
@@ -160,7 +162,7 @@ void server::start_server()
                     }
                     if (server_recv == -1)
                     {
-                        std::cout << std::strerror(errno);
+                        std::cout << std::strerror(errno) << std::endl;
                         break;
                     }
                 }
