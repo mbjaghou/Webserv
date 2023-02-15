@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/15 18:05:01 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/15 20:24:16 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,10 @@ class server
     public:
         //membre fuction
         server();
-        ~server();
         int socket_server_start(void);
         int bind_server(void);
         int lesten_server(void);
-        int accept_server(void);
         int select_socket(fd_set read_fd);
-        ssize_t send_client(const char *str);
         int start_server();
 };
 #endif

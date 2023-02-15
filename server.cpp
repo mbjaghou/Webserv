@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/15 18:09:13 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/15 20:28:23 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,6 @@
 server::server()
 {
     std::cout << "Welcome to my server \n";
-}
-
-server::~server()
-{
-    std::cout << "God bye \n";
 }
 
 int server::bind_server(void)
@@ -45,17 +40,6 @@ int server::lesten_server(void)
     }
     return (0);
 }
-int server::accept_server(void)
-{
-    int addrlen = sizeof(addr);
-    server_accept = accept(server_socket, NULL, NULL);
-    if (server_accept < 0)
-    {
-        std::cout << "\033[32m" <<  std::strerror(errno) << " accept" << "\033[0m" << std::endl;
-        return (1);
-    }
-    return (0);
-}
 
 int server::select_socket(fd_set read_fd)
 {
@@ -66,17 +50,6 @@ int server::select_socket(fd_set read_fd)
         return (1);
     }
     return (0);
-}
-ssize_t server::send_client(const char *str)
-{
-    server_send = send(server_accept, str, strlen(str), 0);
-    if (server_send < 0)
-    {
-        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
-        return (1);
-    }
-    return (0);
-
 }
 
 int server::socket_server_start(void)
@@ -90,7 +63,7 @@ int server::socket_server_start(void)
     int i = 1;
     if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i))) < 0)
         return (1);
-    //fcntl(server_socket, F_SETFL, O_NONBLOCK);
+    fcntl(server_socket, F_SETFL, O_NONBLOCK);
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(PORT);
@@ -106,8 +79,9 @@ int server::start_server()
 {
     fd_set read_fd;
     int i;
+    int addrlen = sizeof(addr);
     const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
-
+    
     if (socket_server_start())
         return (1);
     for(i = 0; i < FD_SETSIZE; i++)
@@ -125,7 +99,7 @@ int server::start_server()
         {
             if (FD_ISSET(server_socket, &read_fd))
             {
-                if(!accept_server())
+                if((server_accept = accept(server_socket, (struct sockaddr *)&addr, (socklen_t*)&addrlen)) >= 0)
                 {
                     setsockopt(server_accept , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
                     for (i = 0; i < FD_SETSIZE; ++i)
@@ -137,7 +111,6 @@ int server::start_server()
                         }
                     }
                 }
-               
             }
             for (i = 1; i < FD_SETSIZE; ++i)
             {   
@@ -153,16 +126,10 @@ int server::start_server()
                     {
                         write(1,buffer,strlen(buffer));
                     }
-                    if (server_recv == -1)
-                    {
-                        std::cout << "\033[32m" <<  std::strerror(errno) << " recv" << "\033[0m" << std::endl;
-                        break;
-                    }
                 }
             }
         }
-        if (send_client(hello))
-            return (1);
+        server_send = send(server_accept, hello, strlen(hello), 0);
     }
     for (i = 0; i < FD_SETSIZE; i++)
     {
