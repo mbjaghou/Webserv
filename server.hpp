@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/14 15:55:00 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/15 18:05:01 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #define SERVER_HPP
 
 #define PORT 8080
-#define MAX_CONNECTION 50
 #define BUFFER 50000
 
 #include <iostream>
@@ -35,7 +34,7 @@ class server
         int server_bind;
         int server_lesten;
         int server_accept;
-        int connection[MAX_CONNECTION];
+        int connection[FD_SETSIZE];
         int server_select;
         ssize_t server_send;
         ssize_t server_recv;
@@ -45,13 +44,12 @@ class server
         //membre fuction
         server();
         ~server();
-        int close(void);
         int socket_server_start(void);
         int bind_server(void);
         int lesten_server(void);
         int accept_server(void);
         int select_socket(fd_set read_fd);
         ssize_t send_client(const char *str);
-        void start_server();
+        int start_server();
 };
 #endif

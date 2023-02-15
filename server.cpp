@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/14 16:05:41 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/15 18:09:13 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ server::server()
 server::~server()
 {
     std::cout << "God bye \n";
-    close();
 }
 
 int server::bind_server(void)
@@ -28,8 +27,9 @@ int server::bind_server(void)
     server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr));
     if (server_bind < 0)
     {
-        std::cout << std::strerror(errno);
-        close();
+        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
+        ::close(server_socket);
+        return (1);
     }
     return (0);
 }
@@ -39,30 +39,22 @@ int server::lesten_server(void)
     server_lesten = listen(server_socket, SOMAXCONN);
     if (server_lesten < 0)
     {
-        std::cout << std::strerror(errno);
-        close();
+        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
+        ::close(server_socket);
+        return (1);
     }
     return (0);
 }
 int server::accept_server(void)
 {
     int addrlen = sizeof(addr);
-    server_accept = accept(server_socket, (struct sockaddr *)&addr, (socklen_t*)&addrlen);
+    server_accept = accept(server_socket, NULL, NULL);
     if (server_accept < 0)
     {
-        std::cout << "\n\n============================\n\n\n";
-        std::cout << std::strerror(errno);
-        close();
-        return 1;
+        std::cout << "\033[32m" <<  std::strerror(errno) << " accept" << "\033[0m" << std::endl;
+        return (1);
     }
     return (0);
-}
-
-int server::close(void)
-{
-    ::close(server_socket);
-    ::close(server_accept);
-    return (1);
 }
 
 int server::select_socket(fd_set read_fd)
@@ -70,8 +62,8 @@ int server::select_socket(fd_set read_fd)
     server_select = select(FD_SETSIZE, &read_fd, NULL, NULL, NULL);
     if (server_select < 0)
     {
-        std::cout << std::strerror(errno);
-        close();
+        std::cout << "\033[32m" <<  std::strerror(errno)  << " select" << "\033[0m" << std::endl;
+        return (1);
     }
     return (0);
 }
@@ -80,8 +72,8 @@ ssize_t server::send_client(const char *str)
     server_send = send(server_accept, str, strlen(str), 0);
     if (server_send < 0)
     {
-        std::cout << std::strerror(errno);
-        close();
+        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
+        return (1);
     }
     return (0);
 
@@ -89,52 +81,54 @@ ssize_t server::send_client(const char *str)
 
 int server::socket_server_start(void)
 {
-    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket < 0)
     {
-        std::cout << std::strerror(errno);
-        close();
+        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
+        return (1);
     }
     int i = 1;
-    setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
-    // fcntl(server_socket, F_SETFL, O_NONBLOCK);   
+    if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i))) < 0)
+        return (1);
+    //fcntl(server_socket, F_SETFL, O_NONBLOCK);
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(PORT);
     memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
-    bind_server();
-    lesten_server();
+    if (bind_server())
+        return (1);
+    if (lesten_server())
+        return (1);
     return (0);
 }
 
-void server::start_server()
+int server::start_server()
 {
     fd_set read_fd;
-
-    const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
     int i;
+    const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
 
-    socket_server_start();
-    for(int i = 0; i < MAX_CONNECTION; i++)
-        connection[i] = -1;
-    
+    if (socket_server_start())
+        return (1);
+    for(i = 0; i < FD_SETSIZE; i++)
+         connection[i] = -1;
     connection[0] = server_socket;
     while (1)
     {
         FD_ZERO(&read_fd);
-        for (i = 0; i < MAX_CONNECTION;++i)
+        for (i = 0; i < FD_SETSIZE;++i)
         {
             if (connection[i] >= 0)
                 FD_SET(connection[i], &read_fd);
         }
         if (!select_socket(read_fd))
         {
-            // setsockopt(server_accept , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
             if (FD_ISSET(server_socket, &read_fd))
             {
                 if(!accept_server())
                 {
-                    for (i = 0; i < MAX_CONNECTION; ++i)
+                    setsockopt(server_accept , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
+                    for (i = 0; i < FD_SETSIZE; ++i)
                     {
                         if (connection[i] < 0)
                         {
@@ -145,7 +139,7 @@ void server::start_server()
                 }
                
             }
-            for (i = 1; i < MAX_CONNECTION; ++i)
+            for (i = 1; i < FD_SETSIZE; ++i)
             {   
                 if (connection[i] > 0 && FD_ISSET(connection[i], &read_fd))
                 {
@@ -153,7 +147,6 @@ void server::start_server()
                     if (server_recv == 0)
                     {
                         ::close(connection[i]);
-                        std::cout << "\n=======================shutdown====================\n";
                         connection[i] = -1;
                     }
                     if (server_recv > 0)
@@ -162,15 +155,16 @@ void server::start_server()
                     }
                     if (server_recv == -1)
                     {
-                        std::cout << std::strerror(errno) << std::endl;
+                        std::cout << "\033[32m" <<  std::strerror(errno) << " recv" << "\033[0m" << std::endl;
                         break;
                     }
                 }
             }
         }
-        send_client(hello);
+        if (send_client(hello))
+            return (1);
     }
-    for (int i = 0; i < MAX_CONNECTION; i++)
+    for (i = 0; i < FD_SETSIZE; i++)
     {
         if (connection[i] > 0)
         {
