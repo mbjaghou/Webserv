@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/15 20:28:23 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/16 16:01:51 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,7 @@
 
 server::server()
 {
-    std::cout << "Welcome to my server \n";
-}
-
-int server::bind_server(void)
-{
-    server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr));
-    if (server_bind < 0)
-    {
-        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
-        ::close(server_socket);
-        return (1);
-    }
-    return (0);
-}
-
-int server::lesten_server(void)
-{
-    server_lesten = listen(server_socket, SOMAXCONN);
-    if (server_lesten < 0)
-    {
-        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
-        ::close(server_socket);
-        return (1);
-    }
-    return (0);
+    std::cout << "\033[32m" << "Welcome to my server" << "\033[0m" << std::endl;
 }
 
 int server::select_socket(fd_set read_fd)
@@ -46,7 +22,7 @@ int server::select_socket(fd_set read_fd)
     server_select = select(FD_SETSIZE, &read_fd, NULL, NULL, NULL);
     if (server_select < 0)
     {
-        std::cout << "\033[32m" <<  std::strerror(errno)  << " select" << "\033[0m" << std::endl;
+        throw std::invalid_argument(strerror(errno));
         return (1);
     }
     return (0);
@@ -54,24 +30,26 @@ int server::select_socket(fd_set read_fd)
 
 int server::socket_server_start(void)
 {
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket < 0)
-    {
-        std::cout << "\033[32m" <<  std::strerror(errno) << "\033[0m" << std::endl;
-        return (1);
-    }
-    int i = 1;
-    if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i))) < 0)
-        return (1);
+    if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        throw std::invalid_argument(strerror(errno));
+    int opt = 1;
+    if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
+       throw std::invalid_argument("Error address socket is already used");
     fcntl(server_socket, F_SETFL, O_NONBLOCK);
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(PORT);
     memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
-    if (bind_server())
-        return (1);
-    if (lesten_server())
-        return (1);
+    if (( server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr))) < 0)
+    {
+        throw std::invalid_argument(strerror(errno));
+        ::close(server_socket);
+    }
+    if (( server_lesten = listen(server_socket, SOMAXCONN)) < 0)
+    { 
+        throw std::invalid_argument(strerror(errno));
+        ::close(server_socket);
+    }
     return (0);
 }
 
@@ -101,7 +79,6 @@ int server::start_server()
             {
                 if((server_accept = accept(server_socket, (struct sockaddr *)&addr, (socklen_t*)&addrlen)) >= 0)
                 {
-                    setsockopt(server_accept , SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
                     for (i = 0; i < FD_SETSIZE; ++i)
                     {
                         if (connection[i] < 0)

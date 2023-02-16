@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/15 20:24:16 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/16 15:50:26 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <sys/select.h>
 #include <fcntl.h>
+#include <exception>
 
 class server
 {
@@ -44,8 +45,6 @@ class server
         //membre fuction
         server();
         int socket_server_start(void);
-        int bind_server(void);
-        int lesten_server(void);
         int select_socket(fd_set read_fd);
         int start_server();
 };
