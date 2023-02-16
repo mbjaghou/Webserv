@@ -6,12 +6,12 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:03 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/02/16 14:44:06 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/16 19:21:42 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-// #include "codes.hpp"
+#include "codes.hpp"
 #include <iostream>
 #include <map>
 #include <vector>
@@ -35,7 +35,9 @@ private:
 
 public:
 	// Request(std::string & buffer, ConfigFileParser const &config);
+    Request(std::string & buffer);
 	~Request();
+    Request() {};
 
 	void RequestParsing();
 	void ParseStartLine(std::string & str);

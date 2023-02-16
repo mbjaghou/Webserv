@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2022/12/27 19:03:07 by ylabtaim         ###   ########.fr       */
+/*   Updated: 2023/02/16 19:27:52 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./../../headers/http/Response.hpp"
+#include "./../headers/http/Response.hpp"
 
 Response::Response(Request req) {
 	_Headers = req.getHeaders();
@@ -108,29 +108,29 @@ std::string Response::uploadFile() {
 	return (headers.str() + success);
 }
 
-std::string Response::cgi(Request const &obj){
-	std::string tmp = obj.getHost();
-	size_t pos = tmp.find_first_of(":");
-	short port;
-	std::string para;
-	if (pos == std::string::npos)
-		port = 80;
-	else{
-		pos++;
-		port = stoi(tmp.substr(pos));
-	}
-	std::ostringstream headers;
-	try {
-		CGI _cgi(obj, port, _Method);
-		parseCgiOutput(_cgi.GetOutput(), headers, _cgi.GetExtention());
-	}
-	catch (std::exception const &e) {
-		std::cerr << e.what() << "\n";
-		_Status = 500;
-		return sendErrorPage(500);
-	}
-	return headers.str();
-}
+// std::string Response::cgi(Request const &obj){
+// 	std::string tmp = obj.getHost();
+// 	size_t pos = tmp.find_first_of(":");
+// 	short port;
+// 	std::string para;
+// 	if (pos == std::string::npos)
+// 		port = 80;
+// 	else{
+// 		pos++;
+// 		port = stoi(tmp.substr(pos));
+// 	}
+// 	std::ostringstream headers;
+// 	try {
+// 		CGI _cgi(obj, port, _Method);
+// 		parseCgiOutput(_cgi.GetOutput(), headers, _cgi.GetExtention());
+// 	}
+// 	catch (std::exception const &e) {
+// 		std::cerr << e.what() << "\n";
+// 		_Status = 500;
+// 		return sendErrorPage(500);
+// 	}
+// 	return headers.str();
+// }
 
 std::string Response::sendHeaders(const std::string &filename) {
 	std::ifstream file(filename);

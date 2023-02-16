@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/16 16:01:51 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/16 19:38:32 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ int server::select_socket(fd_set read_fd)
 
 int server::socket_server_start(void)
 {
+    
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         throw std::invalid_argument(strerror(errno));
     int opt = 1;
@@ -59,7 +60,8 @@ int server::start_server()
     int i;
     int addrlen = sizeof(addr);
     const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
-    
+
+    std::string response;
     if (socket_server_start())
         return (1);
     for(i = 0; i < FD_SETSIZE; i++)
@@ -101,12 +103,16 @@ int server::start_server()
                     }
                     if (server_recv > 0)
                     {
-                        write(1,buffer,strlen(buffer));
+                        std::string tmp = buffer;
+                        Request o(tmp);
+                        std::cout << o.getStatus() << '\n';
+                        Response res(o);
+                        response = res.sendFile("/Users/mbjaghou/Desktop/Webserv/config.conf");
                     }
                 }
             }
         }
-        server_send = send(server_accept, hello, strlen(hello), 0);
+        server_send = send(server_accept, response.c_str(), response.size(), 0);
     }
     for (i = 0; i < FD_SETSIZE; i++)
     {

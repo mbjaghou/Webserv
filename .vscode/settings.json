@@ -61,6 +61,12 @@
         "utility": "cpp",
         "vector": "cpp",
         "__tree": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "memory_resource": "cpp",
+        "deque": "cpp",
+        "fstream": "cpp",
+        "iomanip": "cpp",
+        "set": "cpp",
+        "stack": "cpp"
     }
 }
