@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/02/16 19:29:02 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/16 20:08:26 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,11 @@
 Request::Request(std::string &buffer) : _Status(OK), _Buffer(buffer) {
 	RequestParsing();
 }
+
+
+
+
+
 
 Request::~Request() {}
 

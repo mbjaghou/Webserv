@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/16 19:38:32 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/17 15:17:16 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,11 @@ int server::start_server()
                         Request o(tmp);
                         std::cout << o.getStatus() << '\n';
                         Response res(o);
-                        response = res.sendFile("/Users/mbjaghou/Desktop/Webserv/config.conf");
+                        response = res.sendFile("/Users/mbjaghou/Desktop/Webserv/server/main.cpp");
+                    }
+                    if (server_recv == -1)
+                    {
+                        continue;   
                     }
                 }
             }

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/16 19:25:27 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/17 15:15:58 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@
 #include <sys/select.h>
 #include <fcntl.h>
 #include <exception>
-#include "./headers/http/Request.hpp"
-#include "./headers/http/Response.hpp"
+#include "./../headers/http/Request.hpp"
+#include "./../headers/http/Response.hpp"
 
 #include <vector>
 class server
