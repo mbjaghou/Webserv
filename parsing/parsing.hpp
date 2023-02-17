@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/17 15:50:09 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/17 18:25:11 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,18 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <exception>
 
 class pars
 {
     public:
-        void setup_config_file();
+        std::vector<std::string> listen;
+        std::vector<std::string> server_name;
         std::vector<std::string> config;
+        std::vector<std::string> root;
+        std::vector<std::string> index;
+        std::vector<std::string> error_page;
+        
         void open_file_read(char **av);
         void parsing_config();
     
