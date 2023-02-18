@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/18 15:37:58 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/18 18:29:06 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ void pars::open_file_read(char **av)
 {
     std::string line;
     std::fstream file(av[1]);
-    
 
     if (file.is_open())
     {
@@ -25,7 +24,6 @@ void pars::open_file_read(char **av)
             parsing_config(line);
         }
         file.close();
-        // std::cout << "===== " << count_server << " ======\n";
     }
     else
         throw std::invalid_argument("bad Open File");
@@ -33,13 +31,12 @@ void pars::open_file_read(char **av)
 
 void pars::parsing_config(std::string line)
 {
-    if (int i = (!line.find("#")))
+    
+    while (int i = (line.find("#")) != std::string::npos)
     {
         line.erase(i - 1);
     }
-    if (!line.find("server" , 0, 6))
-        count_server++;
-    else if (!line.find("    server_name", 0 , 14))
+    if (!line.find("    server_name", 0 , 14))
     {
         std::string tmp = line.substr(15);
         server_name.push_back(tmp);
@@ -70,5 +67,27 @@ void pars::parsing_config(std::string line)
         index.push_back(tmp);
     }
     if (line[0] && line[0] != '\n')
-        config.push_back(line);
+    {
+         config.push_back(line);
+        //  check(config, line);
+    }
 }
+
+
+// void pars::check(std::vector<std::string> vec, std::string str)
+// {
+//     int i;
+
+//     std::cout << *vec.begin() << "===="  << std::endl;
+//     // if (str[0] && !str.find("{", str.size() + 1) && i == 0)
+//     // {
+//     //     i = 1;
+//     // }
+//     // if (!str.find("}") && i == 1)
+//     //     i = 0;
+//     // if (i == 1)
+//     // {
+//     //     std::cout << "error\n";
+//     //     exit(1);
+//     // }
+// }
