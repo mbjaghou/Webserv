@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/18 19:39:37 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/02/19 15:45:52 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@ class pars
         int count_server;
 
         std::vector<pars_server> parssing;
-        std::string tmp1;
+        std::string				conf_file;
 
         void open_file_read(char **av);
         void parsing_config(std::string line);
         void check_bracket(std::string str);
         void check_error(void);
+		void stock_data(void);
     
 };
 
