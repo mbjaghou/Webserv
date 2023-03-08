@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/19 17:05:35 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/08 18:12:17 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,21 +73,27 @@ void pars::check_error(void)
 
 void pars::stock_data(void)
 {
-	int i = 0;
+	// stock the data from config file in the vector of class pars_server
 	
-	int start_pos;
-	int last_pos;
-	
-	while (conf_file[i])
+	int i = -1;
+	while (++i < count_server)
 	{
-		pars_server config;
-		start_pos = conf_file.find_first_not_of(" \t\n");
-		if (start_pos == std::string::npos)
-			std::cout << "Error\n";
-		last_pos = conf_file.find_first_of(" \t\n");
-		if (last_pos == std::string::npos)
-			std::cout << "Error1\n";
-		i++;
+		pars_server server;
+		if (conf_file.find("server {", 0, 8) != std::string::npos)
+		{
+			std::string tmp;
+			tmp = conf_file.substr(conf_file.find("listen", 0, 6), conf_file.find(";", 0, 1));
+			int port = atoi(tmp.c_str());
+			server.port.push_back(port);
+			std::string server_name = conf_file.substr(conf_file.find("server_name", 0, 11), conf_file.find(";", 0, 1));
+			server.server_name.push_back(server_name);
+			std::string  root = conf_file.substr(conf_file.find("root", 0, 4), conf_file.find(";", 0, 1));
+			server.root.push_back(root);
+			std::string  index = conf_file.substr(conf_file.find("index", 0, 5), conf_file.find(";", 0, 1));
+			server.index.push_back(index);
+			std::string  error_page = conf_file.substr(conf_file.find("error_page", 0, 10), conf_file.find(";", 0, 1));
+			server.error_page.push_back(error_page);
+		}
+		parssing.push_back(server);
 	}
-	std::cout << start_pos << "    " << last_pos << std::endl;
 }

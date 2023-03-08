@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:15 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/19 15:45:00 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/08 18:12:54 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,23 @@
 class pars_server
 {
     private:
-        int port;
-        std::string 				root;
+
+    public:
+        std::vector<int> port;
+        std::vector<std::string> 				root;
         std::vector<std::string> 	server_name;
         std::vector<std::string> 	index;
-        std::map<int, std::string> 	error_page;
-    public:
+        std::vector<std::string> 	error_page;
 
-    int							get_port(void);
+	
+    std::vector<int>							get_port(void);
     std::vector<std::string> 	get_server_name(void);
     std::vector<std::string> 	get_index(void);
-    std::map<int, std::string> 	get_error_page(void);
-    void        				set_port(int port);
+    std::vector<std::string>  	get_error_page(void);
+    void        				set_port(std::vector<int> port);
     void        				set_server_name(std::vector<std::string> server_name);
     void        				set_index(std::vector<std::string> index);
-    void        				set_error_page(std::map<int, std::string> error_page);
+    void        				set_error_page(std::vector<std::string>  error_page);
     
     
     

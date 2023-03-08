@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/19 15:45:52 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/08 16:56:49 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@
 class pars
 {
     public:
-        std::vector<std::string> listen;
-        std::vector<std::string> server_name;
-        std::vector<std::string> root;
-        std::vector<std::string> index;
-        std::vector<std::string> error_page;
+        // std::vector<std::string> listen;
+        // std::vector<std::string> server_name;
+        // std::vector<std::string> root;
+        // std::vector<std::string> index;
+        // std::vector<std::string> error_page;
         int count_server;
 
         std::vector<pars_server> parssing;
