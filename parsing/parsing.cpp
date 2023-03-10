@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/10 13:48:09 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/10 14:35:40 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,9 @@ void pars::check_error(void)
 
 void pars::parsing_config(std::string line)
 {
-    while (int i = (line.find("#", 0)) != std::string::npos)
-    {
-		std::cout << line << " first case "  << i << std::endl;
-        line.erase(i - 1);
-    }
+	int i = line.find_first_of("#");
+	if (i >= 0)
+		line.erase(i);
     if (line[0] && line[0] != '\n')
     {
          conf_file += line + "\n";
@@ -92,7 +90,6 @@ void pars::open_file_read(char **av)
 void pars::stock_data(void)
 {
 	std::vector<std::string> config;
-
 	config = ft_split(conf_file, "\n");
 
 	int count = 0;
