@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/10 11:14:29 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/10 13:18:37 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 class pars
 {
     public:
-        int count_server;
         std::vector<pars_server> parssing;
         std::string				conf_file;
 

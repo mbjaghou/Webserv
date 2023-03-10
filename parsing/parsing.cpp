@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/10 12:29:03 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/10 13:48:09 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,11 @@ void pars::check_error(void)
 
 void pars::parsing_config(std::string line)
 {
-    while (int i = (line.find("#")) != std::string::npos)
+    while (int i = (line.find("#", 0)) != std::string::npos)
     {
+		std::cout << line << " first case "  << i << std::endl;
         line.erase(i - 1);
     }
-	if (!line.find("server {", 0, 8))
-			count_server++;
     if (line[0] && line[0] != '\n')
     {
          conf_file += line + "\n";
@@ -77,7 +76,6 @@ void pars::open_file_read(char **av)
 {
     std::string line;
     std::fstream file(av[1]);
-    count_server = 0;
 
     if (file && file.is_open())
     {
@@ -117,54 +115,54 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 	
 	tmp = ft_split(conf[0], " \t");
 	if (tmp[1] != "{")
-		throw std::runtime_error("Error in server");
-	std::vector<std::string>::iterator it = conf.begin() + *count;
-	// if (it == conf.end())
-	// 	return (NULL);
+		throw std::runtime_error("must be add '{' or spase");
+	std::vector<std::string>::iterator it = conf.begin() + (*count);
+	if (it == conf.end())
+		throw std::runtime_error("end of file");
 	*it++;
-	count++;
+	(*count)++;
 	while (it != conf.end())
 	{
-		tmp = ft_split(*it, " \t;");
+		tmp = ft_split(*it, " ;");
 		if (tmp[0] == "}")
 		{
-			std::cout << "test\n";
+			std::cout << "end of server\n";
 			break;
 		}
-		if (tmp[0] == "server_name")
+		if (tmp[0] == "\tserver_name")
 		{
 			std::cout << "server_name" << std::endl;
 		}
-		else if (tmp[0] == "listen")
+		else if (tmp[0] == "\tlisten")
 		{
 			std::cout << "listen" << std::endl;
 		}
-		else if (tmp[0] == "root")
-		{
-			std::cout << "root" << std::endl;
-		}
-		else if (tmp[0] == "error_page")
-		{
-			std::cout << "error_page" << std::endl;
-		}
-		else if (tmp[0] == "index")
-		{
-			std::cout << "index" << std::endl;
-		}
-		else if (tmp[0] == "location")
-		{
-			std::cout << "location" << std::endl;
-		}
-		else if (tmp[0] == "max_client_body_size")
+		else if (tmp[0] == "\tmax_client")
 		{
 			std::cout << "max_client_body_size" << std::endl;
 		}
-		else if (tmp[0] == "allow_methods")
+		else if (tmp[0] == "\troot")
+		{
+			std::cout << "root" << std::endl;
+		}
+		else if (tmp[0] == "\terror_page")
+		{
+			std::cout << "error_page" << std::endl;
+		}
+		else if (tmp[0] == "\tindex")
+		{
+			std::cout << "index" << std::endl;
+		}
+		else if (tmp[0] == "\tlocation")
+		{
+			std::cout << "location" << std::endl;
+		}
+		else if (tmp[0] == "\tallow_methods")
 		{
 			std::cout << "allow_methods" << std::endl;
 		}
 		*it++;
-		count++;
+		(*count)++;
 		
 	}
 	return (server);
@@ -178,4 +176,5 @@ void pars::parsing(int ac, char **av)
 	open_file_read(av);
 	check_error();
 	stock_data();
+	
 }

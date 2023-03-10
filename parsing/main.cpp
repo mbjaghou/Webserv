@@ -9,6 +9,7 @@ int main(int ac, char **av)
         pars pars;
         pars.parsing(ac, av);
 
+
 		// int i = 0;
 		// while (i < pars.count_server)
 		// {

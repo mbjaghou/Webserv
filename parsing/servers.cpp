@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:05 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/09 11:27:49 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/10 12:36:28 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,17 @@ std::vector<std::string>  pars_server::get_error_page(void)
     return (error_page);
 }
 
+std::vector<std::string>  pars_server::get_root(void)
+{
+    return (root);
+}
 void pars_server::set_port(std::vector<int> port)
 {
    this->port = port;
+}
+void pars_server::set_root(std::vector<std::string> root)
+{
+   this->root = root;
 }
 void pars_server::set_server_name(std::vector<std::string> server_name)
 {
