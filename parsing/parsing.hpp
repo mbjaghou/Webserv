@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/08 16:56:49 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/10 11:14:29 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,12 @@
 #include <vector>
 #include <exception>
 
-#include "parse_server.hpp"
+#include "servers.hpp"
 
 class pars
 {
     public:
-        // std::vector<std::string> listen;
-        // std::vector<std::string> server_name;
-        // std::vector<std::string> root;
-        // std::vector<std::string> index;
-        // std::vector<std::string> error_page;
         int count_server;
-
         std::vector<pars_server> parssing;
         std::string				conf_file;
 
@@ -38,6 +32,8 @@ class pars
         void check_bracket(std::string str);
         void check_error(void);
 		void stock_data(void);
+		void parsing(int ac, char **av);
+		pars_server parsing_servers(std::vector<std::string> conf, int *count);
     
 };
 
