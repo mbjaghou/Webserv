@@ -1,4 +1,4 @@
-#include "parsing.hpp"
+#include "../parsing_hpp/parsing.hpp"
 
 
 
@@ -9,7 +9,14 @@ int main(int ac, char **av)
         pars pars;
         pars.parsing(ac, av);
 
+		// std::vector<std::string>::iterator it = pars.parssing[0].index.begin();
+		// for (;it != pars.parssing[0].index.end(); ++it)
+		// 	std::cout << *it << std::endl;
 
+		std::map<int, std::string>::iterator it = pars.parssing[0].error_page.begin();
+		for (;it != pars.parssing[0].error_page.end(); ++it)
+			std::cout << it->first << "      -=" <<  it->second << std::endl;
+		//std::cout << pars.parssing[1]. << std::endl;
 		// int i = 0;
 		// while (i < pars.count_server)
 		// {

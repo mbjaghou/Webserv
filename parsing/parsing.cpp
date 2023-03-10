@@ -6,12 +6,14 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/10 14:35:40 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/10 20:51:26 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing.hpp"
+#include "../parsing_hpp/parsing.hpp"
 
+pars::~pars(){}
+pars::pars(){}
 std::vector<std::string> ft_split(std::string str , const char *c)
 {
 	std::vector<std::string> res;
@@ -128,35 +130,73 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		}
 		if (tmp[0] == "\tserver_name")
 		{
-			std::cout << "server_name" << std::endl;
+			int i = 1;
+			while (i < tmp.size())
+			{
+				server.server_name.push_back(tmp[i]);
+				i++;
+			}
 		}
 		else if (tmp[0] == "\tlisten")
 		{
-			std::cout << "listen" << std::endl;
-		}
-		else if (tmp[0] == "\tmax_client")
-		{
-			std::cout << "max_client_body_size" << std::endl;
+			if (tmp.size() != 2)
+				throw std::runtime_error("listen must be add a port");
+			std::vector<std::string> str = ft_split(tmp[1], ":");
+			if (str.size() <= 2)
+			{
+				if (str.size() == 1)
+				{
+					server.address = "127.0.0.1";
+					server.port = parssing_port(atol(str[0].c_str()));
+				}
+				else
+				{
+					server.address = str[0];
+					server.port = parssing_port(atol(str[1].c_str()));;
+				}
+			}
+				
 		}
 		else if (tmp[0] == "\troot")
 		{
-			std::cout << "root" << std::endl;
-		}
-		else if (tmp[0] == "\terror_page")
-		{
-			std::cout << "error_page" << std::endl;
+			if (tmp.size() == 2)
+				server.root = tmp[1];
+			else
+				throw std::runtime_error("root must be add a path");
 		}
 		else if (tmp[0] == "\tindex")
 		{
-			std::cout << "index" << std::endl;
+			int i = 1;
+			while (i < tmp.size())
+			{
+				server.index.push_back(tmp[i]);
+				i++;
+			}
+		}
+		else if (tmp[0] == "\terror_page")
+		{
+			int status = atol(tmp[1].c_str());
+			if (tmp.size() == 3)
+			{
+				std::cout << tmp[2] << std::endl;
+				server.error_page.insert(std::make_pair(status, tmp[2]));
+			}
+			else
+				throw std::runtime_error("error_page must be add a code and a path");
+			
+			std::cout << "error_page" << std::endl;
+		}
+		else if (tmp[0] == "\tmax_client_body_size")
+		{
+			std::cout << "max_client_body_size" << std::endl;
+		}
+		else if (tmp[0] == "\tallowed_methods")
+		{
+			std::cout << "allow_methods" << std::endl;
 		}
 		else if (tmp[0] == "\tlocation")
 		{
 			std::cout << "location" << std::endl;
-		}
-		else if (tmp[0] == "\tallow_methods")
-		{
-			std::cout << "allow_methods" << std::endl;
 		}
 		*it++;
 		(*count)++;
@@ -166,6 +206,12 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 }
 
 
+int pars::parssing_port(int port)
+{
+	if (port < 0 || port > 65535)
+		throw std::invalid_argument("Error whit the port");
+	return (port);
+}
 void pars::parsing(int ac, char **av)
 {
 	if (ac != 2)

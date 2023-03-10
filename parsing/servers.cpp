@@ -6,14 +6,22 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:05 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/10 12:36:28 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/10 20:42:51 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "servers.hpp"
+#include "../parsing_hpp/servers.hpp"
 
 
-std::vector<int> pars_server::get_port(void)
+
+pars_server::pars_server()
+{
+	port = 0;
+	root = "";
+}
+pars_server::~pars_server(){}
+
+long pars_server::get_port(void)
 {
     return (port);
 }
@@ -25,20 +33,20 @@ std::vector<std::string> pars_server::get_index(void)
 {
     return (index);
 }
-std::vector<std::string>  pars_server::get_error_page(void)
+std::map<int, std::string>  pars_server::get_error_page(void)
 {
     return (error_page);
 }
 
-std::vector<std::string>  pars_server::get_root(void)
+std::string  pars_server::get_root(void)
 {
     return (root);
 }
-void pars_server::set_port(std::vector<int> port)
+void pars_server::set_port(long port)
 {
    this->port = port;
 }
-void pars_server::set_root(std::vector<std::string> root)
+void pars_server::set_root(std::string root)
 {
    this->root = root;
 }
@@ -50,7 +58,7 @@ void pars_server::set_index(std::vector<std::string> index)
 {
     this->index = index;
 }
-void pars_server::set_error_page(std::vector<std::string>  error_page)
+void pars_server::set_error_page(std::map<int, std::string>  error_page)
 {
     this->error_page = error_page;
 }
