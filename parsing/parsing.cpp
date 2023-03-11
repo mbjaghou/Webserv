@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/11 10:39:15 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/11 13:10:57 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ std::vector<std::string> ft_split(const std::string &str, const char *del) {
 	return res;
 }
 
-
-
 void pars::check_bracket(std::string str)
 {
     int bracket;
@@ -47,11 +45,6 @@ void pars::check_bracket(std::string str)
         return ;
     else
         throw std::runtime_error("bracket is missing");
-}
-
-void pars::check_error(void)
-{
-	check_bracket(conf_file);
 }
 
 void pars::parsing_config(std::string line)
@@ -87,6 +80,8 @@ void pars::stock_data(void)
 	std::vector<std::string> config;
 	config = ft_split(conf_file, "\n");
 
+	if (config.end() == config.begin())
+		throw std::runtime_error("Error: config file is empty");
 	int count = 0;
 	while (count < config.size())
 	{
@@ -100,14 +95,54 @@ void pars::stock_data(void)
 	}
 }
 
+int pars::parssing_port(int port)
+{
+	if (port <= 0 || port > 65535)
+		throw std::invalid_argument("Error whit the port");
+	return (port);
+}
+
+location pars::parssing_location(std::vector<std::string> conf, int *count, pars_server server)
+{
+	std::vector<std::string> str = ft_split(conf[*count], " \t");
+	location loc;
+
+	// std::cout << "====="<< str[0] << *count << "\n";
+	if (str[2] != "{")
+		throw std::runtime_error("Error must be add '{' or spase");
+	loc.uploade_path = str[1];
+	(*count)++;
+	std::vector<std::string>::iterator it = conf.begin() + (*count);
+	if (it == conf.end())
+		throw std::runtime_error("end of file");
+	while (it != conf.end())
+	{
+		std::vector<std::string> tmp = ft_split(*it, " ;\t");
+		//std::cout << "start of location222=" << tmp[1] << "\n";
+		if (tmp[0] == "}")
+		{
+			std::cout << "end of location\n";
+			break;
+		}
+		else if (tmp[0] == "root")
+		{
+			std::cout << "root\n";
+		}
+		*it++;
+		(*count)++;
+		
+	}
+	return (loc);
+}
 pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 {
 	std::vector<std::string> tmp;
 	pars_server server;
 	
+	
 	tmp = ft_split(conf[0], " \t");
 	if (tmp[1] != "{")
-		throw std::runtime_error("must be add '{' or spase");
+		throw std::runtime_error("Error must be add '{' or spase");
 	std::vector<std::string>::iterator it = conf.begin() + (*count);
 	if (it == conf.end())
 		throw std::runtime_error("end of file");
@@ -133,7 +168,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		else if (tmp[0] == "\tlisten")
 		{
 			if (tmp.size() != 2)
-				throw std::runtime_error("listen must be add a port");
+				throw std::runtime_error("Error in listen");
 			std::vector<std::string> str = ft_split(tmp[1], ":");
 			if (str.size() <= 2)
 			{
@@ -155,10 +190,12 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 			if (tmp.size() == 2)
 				server.root = tmp[1];
 			else
-				throw std::runtime_error("root must be add a path");
+				throw std::runtime_error("Error in root");
 		}
 		else if (tmp[0] == "\tindex")
 		{
+			if (tmp.size() == 1)
+				throw std::runtime_error("Error in index");
 			int i = 1;
 			while (i < tmp.size())
 			{
@@ -170,13 +207,13 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		{
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
-				throw std::runtime_error("error_page must be add a code between 100 and 599");
+				throw std::runtime_error("Error in satatus code");
 			if (tmp.size() == 3)
 			{
 				server.error_page.insert(std::make_pair(status, tmp[2]));
 			}
 			else
-				throw std::runtime_error("error_page must be add a code and a path");
+				throw std::runtime_error("Error in error_page");
 		}
 		else if (tmp[0] == "\tmax_client_body_size")
 		{
@@ -187,7 +224,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "\tallowed_methods")
 		{
-			if (tmp.size() > 4)
+			if (tmp.size() > 4 || tmp.size() == 1)
 				throw std::runtime_error("Error in allowed_methods");
 			else
 			{
@@ -201,28 +238,36 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "\tlocation")
 		{
-			std::cout << "location" << std::endl;
+			int move_step = *count;
+			server.location.push_back(parssing_location(conf, count, server));
+			*it += *count - move_step;
+			// std::cout << "location" << std::endl;
 		}
 		*it++;
 		(*count)++;
 		
 	}
+	check_content_if_empty(server);
 	return (server);
 }
 
-
-int pars::parssing_port(int port)
+void pars::check_content_if_empty(pars_server server)
 {
-	if (port < 0 || port > 65535)
-		throw std::invalid_argument("Error whit the port");
-	return (port);
+	if (server.port == 0)
+		throw std::runtime_error("must be add port");
+	if (server.root == "")
+		throw std::runtime_error("must be add root");
+	if (server.index.size() == 0)
+		throw std::runtime_error("must be add index");
+	if (server.allowed_methods.size() == 0)
+		throw std::runtime_error("must be add allowed_methods");	
 }
+
 void pars::parsing(int ac, char **av)
 {
 	if (ac != 2)
         throw std::invalid_argument("Error whit the argment");
 	open_file_read(av);
-	check_error();
+	check_bracket(conf_file);
 	stock_data();
-	
 }

@@ -10,8 +10,8 @@ int main(int ac, char **av)
         pars.parsing(ac, av);
 
 
-		// std::cout << pars.parssing[0].allowed_methods[0] << std::endl;
-		// std::cout << pars.parssing[0].allowed_methods[1] << std::endl;
+		// std::cout << pars.parssing[1].port << std::endl;
+		// std::cout << pars.parssing[1].address << std::endl;
 		// std::cout << pars.parssing[0].allowed_methods[2] << std::endl;
 		// std::vector<std::string>::iterator it = pars.parssing[0].index.begin();
 		// for (;it != pars.parssing[0].index.end(); ++it)
