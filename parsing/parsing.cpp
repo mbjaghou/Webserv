@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/10 20:51:26 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/11 10:39:15 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,18 @@
 
 pars::~pars(){}
 pars::pars(){}
-std::vector<std::string> ft_split(std::string str , const char *c)
-{
+std::vector<std::string> ft_split(const std::string &str, const char *del) {
 	std::vector<std::string> res;
-	std::string tmp;
-	int i = -1;
-	while (str[++i] != '\0')
-	{
-		if (str[i] == c[0] || str[i] == c[1] || str[i] == c[2])
-		{
-			if (tmp != "")
-				res.push_back(tmp);
-			tmp = "";
-		}
-		else
-			tmp += str[i];
+	std::size_t pos = 0;
+	std::size_t prev = 0;
+	while ((pos = str.find_first_of(del, prev))!= std::string::npos) {
+		if (str.substr(prev, pos - prev) != "")
+			res.push_back(str.substr(prev, pos - prev));
+		prev = pos + 1;
 	}
-	if (tmp != "")
-		res.push_back(tmp);
-	return (res);
+	if (str.substr(prev) != "")
+		res.push_back(str.substr(prev));
+	return res;
 }
 
 
@@ -176,23 +169,35 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		else if (tmp[0] == "\terror_page")
 		{
 			int status = atol(tmp[1].c_str());
+			if (status < 100 || status > 599)
+				throw std::runtime_error("error_page must be add a code between 100 and 599");
 			if (tmp.size() == 3)
 			{
-				std::cout << tmp[2] << std::endl;
 				server.error_page.insert(std::make_pair(status, tmp[2]));
 			}
 			else
 				throw std::runtime_error("error_page must be add a code and a path");
-			
-			std::cout << "error_page" << std::endl;
 		}
 		else if (tmp[0] == "\tmax_client_body_size")
 		{
-			std::cout << "max_client_body_size" << std::endl;
+			if (tmp.size() == 2)
+				server.max_client_body_size = atol(tmp[1].c_str());
+			else
+				throw std::runtime_error("Error in max_client_body_size");
 		}
 		else if (tmp[0] == "\tallowed_methods")
 		{
-			std::cout << "allow_methods" << std::endl;
+			if (tmp.size() > 4)
+				throw std::runtime_error("Error in allowed_methods");
+			else
+			{
+				int i = 1;
+				while (i < tmp.size())
+				{
+					server.allowed_methods.push_back(tmp[i]);
+					i++;
+				}
+			}
 		}
 		else if (tmp[0] == "\tlocation")
 		{
