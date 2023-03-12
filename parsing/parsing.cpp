@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/11 13:10:57 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/12 12:27:21 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,10 @@ void pars::parsing_config(std::string line)
 	int i = line.find_first_of("#");
 	if (i >= 0)
 		line.erase(i);
+	int j = line.find_last_of(";{}");
+	line.erase(j + 1);
+	if (j != line.size() - 1)
+		throw std::runtime_error("Error: ';' or '}' is missing");
     if (line[0] && line[0] != '\n')
     {
          conf_file += line + "\n";
@@ -107,7 +111,6 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 	std::vector<std::string> str = ft_split(conf[*count], " \t");
 	location loc;
 
-	// std::cout << "====="<< str[0] << *count << "\n";
 	if (str[2] != "{")
 		throw std::runtime_error("Error must be add '{' or spase");
 	loc.uploade_path = str[1];
@@ -128,6 +131,18 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 		{
 			std::cout << "root\n";
 		}
+		else if (tmp[0] == "return")
+		{
+			std::cout << "return\n";
+		}
+		else if (tmp[0] == "autoindex")
+		{
+			std::cout << "autoindex\n";	
+		}
+		else if (tmp[0] == "index")
+		{
+			std::cout << "index\n";
+		}
 		*it++;
 		(*count)++;
 		
@@ -143,11 +158,10 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 	tmp = ft_split(conf[0], " \t");
 	if (tmp[1] != "{")
 		throw std::runtime_error("Error must be add '{' or spase");
+	(*count)++;
 	std::vector<std::string>::iterator it = conf.begin() + (*count);
 	if (it == conf.end())
 		throw std::runtime_error("end of file");
-	*it++;
-	(*count)++;
 	while (it != conf.end())
 	{
 		tmp = ft_split(*it, " ;");
@@ -240,8 +254,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		{
 			int move_step = *count;
 			server.location.push_back(parssing_location(conf, count, server));
-			*it += *count - move_step;
-			// std::cout << "location" << std::endl;
+			it += *count - move_step;
 		}
 		*it++;
 		(*count)++;

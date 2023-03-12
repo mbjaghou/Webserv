@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:15 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/10 20:49:34 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/11 12:29:16 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include "parse_location.hpp"
+
 class pars_server
 {
     public:
@@ -25,7 +27,9 @@ class pars_server
         std::vector<std::string> 	index;
         std::map<int, std::string> 	error_page;
 		std::string 				address; 
-	
+		long 						max_client_body_size;
+		std::vector<std::string> 	allowed_methods;
+		std::vector<location> 	 	location;
 	pars_server();
 	~pars_server();
     long							get_port(void);
