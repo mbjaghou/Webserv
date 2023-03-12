@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/12 15:24:23 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/12 17:46:34 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ int pars::parssing_port(int port)
 	return (port);
 }
 
-location pars::parssing_location(std::vector<std::string> conf, int *count, pars_server server)
+location pars::parssing_location(std::vector<std::string> conf, int *count)
 {
 	std::vector<std::string> str = ft_split(conf[*count], " \t");
 	location loc;
@@ -122,14 +122,13 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 	{
 		std::vector<std::string> tmp = ft_split(*it, " ;\t");
 		if (tmp[0] == "}")
-		{
-			std::cout << "end of location\n";
 			break;
-		}
 		else if (tmp[0] == "root")
 		{
 			if (tmp.size() == 2)
+			{
 				loc.root = tmp[1];
+			}
 			else
 				throw std::runtime_error("Error in root location");
 		}
@@ -170,6 +169,39 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 			else
 				throw std::runtime_error("Error in error_page");
 		}
+		else if (tmp[0] == "autoindex")
+		{
+			if (tmp.size() == 2)
+			{
+				if (tmp[1] == "on")
+					loc.autoindex = tmp[1];
+				else if (tmp[1] == "off")
+					loc.autoindex = tmp[1];
+				else
+					throw std::runtime_error("Error in autoindex you must be add 'on' or 'off' in location");
+			}
+			else
+				throw std::runtime_error("Error in autoindex in location");
+		}
+		else if (tmp[0] == "max_client_body_size")
+		{
+			if (tmp.size() == 2)
+				loc.max_client_body_size = atol(tmp[1].c_str());
+			else
+				throw std::runtime_error("Error in max_client_body_size");
+		}
+		else if (tmp[0] == "error_page")
+		{
+			int status = atol(tmp[1].c_str());
+			if (status < 100 || status > 599)
+				throw std::runtime_error("Error in satatus code location");
+			if (tmp.size() == 3)
+			{
+				loc.error_page.insert(std::make_pair(status, tmp[2]));
+			}
+			else
+				throw std::runtime_error("Error in error_page location");
+		}
 		else
 			throw std::runtime_error("Error: bad location");
 		*it++;
@@ -194,12 +226,11 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 	{
 		tmp = ft_split(*it, " ;");
 		if (tmp[0] == "}")
-		{
-			std::cout << "end of server\n";
 			break;
-		}
 		if (tmp[0] == "\tserver_name")
 		{
+			if (server.server_name.size() != 0)
+				throw std::runtime_error("Error server_name is duplicate");
 			int i = 1;
 			while (i < tmp.size())
 			{
@@ -216,12 +247,17 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 			{
 				if (str.size() == 1)
 				{
+					if (str[0].find(".") != std::string::npos)
+						throw std::runtime_error("Error in listen");
 					server.address = "127.0.0.1";
 					server.port = parssing_port(atol(str[0].c_str()));
 				}
 				else
 				{
-					server.address = str[0];
+					if (str[0] == "localhost")
+						server.address = "127.0.0.1";
+					else
+						server.address = str[0];
 					server.port = parssing_port(atol(str[1].c_str()));;
 				}
 			}
@@ -230,12 +266,19 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		else if (tmp[0] == "\troot")
 		{
 			if (tmp.size() == 2)
-				server.root = tmp[1];
+			{
+				if (server.root.size() != 0)
+					throw std::runtime_error("Error root is duplicate");
+				else
+					server.root = tmp[1];
+			}
 			else
 				throw std::runtime_error("Error in root");
 		}
 		else if (tmp[0] == "\tindex")
 		{
+			if (server.index.size() != 0)
+				throw std::runtime_error("Error index is duplicate");
 			if (tmp.size() == 1)
 				throw std::runtime_error("Error in index");
 			int i = 1;
@@ -247,11 +290,14 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "\terror_page")
 		{
+			if (server.error_page.size() != 0)
+				throw std::runtime_error("Error error_page is duplicate");
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
 				throw std::runtime_error("Error in satatus code");
 			if (tmp.size() == 3)
 			{
+				std::cout << "======== " << tmp[2] << std::endl;
 				server.error_page.insert(std::make_pair(status, tmp[2]));
 			}
 			else
@@ -259,6 +305,8 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "\tmax_client_body_size")
 		{
+			if (server.max_client_body_size != 0)
+				throw std::runtime_error("Error max_client_body_size is duplicate");
 			if (tmp.size() == 2)
 				server.max_client_body_size = atol(tmp[1].c_str());
 			else
@@ -270,6 +318,8 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 				throw std::runtime_error("Error in allowed_methods");
 			else
 			{
+				if (server.allowed_methods.size() != 0)
+					throw std::runtime_error("Error in allowed_methods is duplicate");
 				int i = 1;
 				while (i < tmp.size())
 				{
@@ -282,6 +332,8 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		{
 			if (tmp.size() == 2)
 			{
+				if (server.autoindex.size() != 0)
+					throw std::runtime_error("Error autoindex is duplicate");
 				if (tmp[1] == "on")
 					server.autoindex = tmp[1];
 				else if (tmp[1] == "off")
@@ -295,7 +347,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		else if (tmp[0] == "\tlocation")
 		{
 			int move_step = *count;
-			server.location.push_back(parssing_location(conf, count, server));
+			server.location.push_back(parssing_location(conf, count));
 			it += *count - move_step;
 		}
 		else

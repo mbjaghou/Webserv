@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:05 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/11 11:07:58 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/12 17:21:41 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,26 @@ std::map<int, std::string>  pars_server::get_error_page(void)
     return (error_page);
 }
 
+std::string pars_server::get_address(void)
+{
+	return (address);
+}
+
+long pars_server::get_max_client_body_size(void)
+{
+	return (max_client_body_size);
+}
+
+
+std::vector<std::string> pars_server::get_allowed_methods(void)
+{
+	return (allowed_methods);
+}
+
+std::string pars_server::get_autoindex(void)
+{
+	return (autoindex);
+}
 std::string  pars_server::get_root(void)
 {
     return (root);
@@ -63,4 +83,24 @@ void pars_server::set_index(std::vector<std::string> index)
 void pars_server::set_error_page(std::map<int, std::string>  error_page)
 {
     this->error_page = error_page;
+}
+
+void pars_server::set_address(std::string address)
+{
+	this->address = address;
+}
+
+void pars_server::set_max_client_body_size(long max_client_body_size)
+{
+	this->max_client_body_size = max_client_body_size;
+}
+
+void pars_server::set_allowed_methods(std::vector<std::string> allowed_methods)
+{
+	this->allowed_methods = allowed_methods;
+}
+
+void pars_server::set_autoindex(std::string autoindex)
+{
+	this->autoindex = autoindex;
 }
