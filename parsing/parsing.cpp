@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/12 19:04:27 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/12 20:05:46 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,18 @@ void pars::check_bracket(std::string str)
 
 void pars::parsing_config(std::string line)
 {
-	
 	int i = line.find_first_of("#");
 	if (i >= 0)
 		line.erase(i);
+	i = 0;
+	for(; line[i] == ' ' || line[i] == '\t'; i++);
+	if(line[i] == '\0' || line[i] == '\n')
+		line.erase(0);
+	
+	i = line.size() - 1;
+	for(; line[i] == ' ' || line[i] == '\t'; i--);
+	line.erase(i + 1);
+	
 	int j = line.find_last_of(";{}");
 	if (j != line.size() - 1)
 		throw std::runtime_error("Error: find another char after ';' Or ';' is missing");

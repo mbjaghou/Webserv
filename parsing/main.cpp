@@ -26,6 +26,14 @@ int main(int ac, char **av)
 				std::cout << "index: " << *it << std::endl;
 			for (std::vector<std::string>::iterator it = pars.parssing[i].get_allowed_methods().begin(); it != pars.parssing[i].get_allowed_methods().end(); it++)
 				std::cout << "allowed_methods: " << *it << std::endl;
+			int j = -1;
+			std::cout << "start location\n";
+			while (++j < pars.parssing[i].location.size())
+			{
+				std::cout << "location root: " << pars.parssing[i].location[j].get_root() << std::endl;
+				std::cout << "location uploade: " << pars.parssing[i].location[j].get_uploade_path() << std::endl;
+			}
+			
 		}
     }
     catch(const std::exception &e)
