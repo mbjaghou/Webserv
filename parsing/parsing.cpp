@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/12 12:27:21 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/12 15:24:23 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,13 @@ void pars::check_bracket(std::string str)
 
 void pars::parsing_config(std::string line)
 {
+	
 	int i = line.find_first_of("#");
 	if (i >= 0)
 		line.erase(i);
 	int j = line.find_last_of(";{}");
-	line.erase(j + 1);
 	if (j != line.size() - 1)
-		throw std::runtime_error("Error: ';' or '}' is missing");
+		throw std::runtime_error("Error: find another char after ';' Or ';' is missing");
     if (line[0] && line[0] != '\n')
     {
          conf_file += line + "\n";
@@ -121,7 +121,6 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 	while (it != conf.end())
 	{
 		std::vector<std::string> tmp = ft_split(*it, " ;\t");
-		//std::cout << "start of location222=" << tmp[1] << "\n";
 		if (tmp[0] == "}")
 		{
 			std::cout << "end of location\n";
@@ -129,23 +128,52 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 		}
 		else if (tmp[0] == "root")
 		{
-			std::cout << "root\n";
-		}
-		else if (tmp[0] == "return")
-		{
-			std::cout << "return\n";
-		}
-		else if (tmp[0] == "autoindex")
-		{
-			std::cout << "autoindex\n";	
+			if (tmp.size() == 2)
+				loc.root = tmp[1];
+			else
+				throw std::runtime_error("Error in root location");
 		}
 		else if (tmp[0] == "index")
 		{
-			std::cout << "index\n";
+			if (tmp.size() == 1)
+				throw std::runtime_error("Error in index location");
+			int i = 1;
+			while (i < tmp.size())
+			{
+				loc.index.push_back(tmp[i]);
+				i++;
+			}
 		}
+		else if (tmp[0] == "allowed_methods")
+		{
+			if (tmp.size() > 4 || tmp.size() == 1)
+				throw std::runtime_error("Error in allowed_methods in location");
+			else
+			{
+				int i = 1;
+				while (i < tmp.size())
+				{
+					loc.allowed_methods.push_back(tmp[i]);
+					i++;
+				}
+			}
+		}
+		else if (tmp[0] == "return")
+		{
+			int status = atol(tmp[1].c_str());
+			if (status < 100 || status > 599)
+				throw std::runtime_error("Error in satatus code");
+			if (tmp.size() == 3)
+			{
+				loc.return_page.insert(std::make_pair(status, tmp[2]));
+			}
+			else
+				throw std::runtime_error("Error in error_page");
+		}
+		else
+			throw std::runtime_error("Error: bad location");
 		*it++;
 		(*count)++;
-		
 	}
 	return (loc);
 }
@@ -250,12 +278,28 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 				}
 			}
 		}
+		else if (tmp[0] == "\tautoindex")
+		{
+			if (tmp.size() == 2)
+			{
+				if (tmp[1] == "on")
+					server.autoindex = tmp[1];
+				else if (tmp[1] == "off")
+					server.autoindex = tmp[1];
+				else
+					throw std::runtime_error("Error in autoindex you must be add 'on' or 'off'");
+			}
+			else
+				throw std::runtime_error("Error in autoindex");
+		}
 		else if (tmp[0] == "\tlocation")
 		{
 			int move_step = *count;
 			server.location.push_back(parssing_location(conf, count, server));
 			it += *count - move_step;
 		}
+		else
+			throw std::runtime_error("Error in server");
 		*it++;
 		(*count)++;
 		
