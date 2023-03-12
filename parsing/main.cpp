@@ -9,12 +9,12 @@ int main(int ac, char **av)
         pars pars;
         pars.parsing(ac, av);
 
+		std::cout << "size of servers: " << pars.parssing.size() << std::endl;
 		int i = -1;
 		while (++i < pars.parssing.size())
 		{
-			for (std::map<int, std::string>::iterator it = pars.parssing[i].get_error_page().begin(); it != pars.parssing[i].get_error_page().end(); it++)
+			for (std::map<int, std::string>::iterator it = pars.parssing[i].error_page.begin(); it != pars.parssing[i].error_page.end(); it++)
 				std::cout << "error_page: " << it->first << " " << it->second << std::endl;
-			std::cout << "size of servers: " << pars.parssing.size() << std::endl;
 			std::cout << "root: " << pars.parssing[i].get_root() << std::endl;
 			std::cout << "port: " << pars.parssing[i].get_port() << std::endl;
 			std::cout << "address: " << pars.parssing[i].get_address() << std::endl;

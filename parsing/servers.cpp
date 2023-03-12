@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:05 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/12 17:21:41 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/12 19:07:46 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,10 @@ pars_server::pars_server()
 	root = "";
 	address = "";
 	max_client_body_size = 0;
+	autoindex = "";
 }
-pars_server::~pars_server(){}
+pars_server::~pars_server(){
+}
 
 long pars_server::get_port(void)
 {

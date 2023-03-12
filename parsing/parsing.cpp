@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/12 17:46:34 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/12 19:04:27 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,13 +127,18 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 		{
 			if (tmp.size() == 2)
 			{
-				loc.root = tmp[1];
+				if (loc.root.size() != 0)
+					throw std::runtime_error("Error root is duplicate location");
+				else
+					loc.root = tmp[1];
 			}
 			else
 				throw std::runtime_error("Error in root location");
 		}
 		else if (tmp[0] == "index")
 		{
+			if (loc.index.size() != 0)
+				throw std::runtime_error("Error index is duplicate location");
 			if (tmp.size() == 1)
 				throw std::runtime_error("Error in index location");
 			int i = 1;
@@ -149,6 +154,8 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 				throw std::runtime_error("Error in allowed_methods in location");
 			else
 			{
+				if (loc.allowed_methods.size() != 0)
+					throw std::runtime_error("Error in allowed_methods is duplicate location");
 				int i = 1;
 				while (i < tmp.size())
 				{
@@ -159,6 +166,8 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "return")
 		{
+			if (loc.return_page.size() != 0)
+				throw std::runtime_error("Error return is duplicate location");
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
 				throw std::runtime_error("Error in satatus code");
@@ -173,6 +182,8 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 		{
 			if (tmp.size() == 2)
 			{
+				if (loc.autoindex.size() != 0)
+					throw std::runtime_error("Error autoindex is duplicate location");
 				if (tmp[1] == "on")
 					loc.autoindex = tmp[1];
 				else if (tmp[1] == "off")
@@ -185,6 +196,8 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "max_client_body_size")
 		{
+			if (loc.max_client_body_size != 0)
+				throw std::runtime_error("Error max_client_body_size is duplicate location");
 			if (tmp.size() == 2)
 				loc.max_client_body_size = atol(tmp[1].c_str());
 			else
@@ -192,6 +205,8 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "error_page")
 		{
+			if (loc.error_page.size() != 0)
+				throw std::runtime_error("Error error_page is duplicate location");
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
 				throw std::runtime_error("Error in satatus code location");
@@ -297,7 +312,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 				throw std::runtime_error("Error in satatus code");
 			if (tmp.size() == 3)
 			{
-				std::cout << "======== " << tmp[2] << std::endl;
+				// std::cout << "======== " << tmp[2] << std::endl;
 				server.error_page.insert(std::make_pair(status, tmp[2]));
 			}
 			else
