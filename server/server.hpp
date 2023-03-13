@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/02/17 15:15:58 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 15:05:14 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class server
     private:
         //attrbuite
         struct sockaddr_in addr;
-        std::vector<std::pair<int, sockaddr_in> > Serve;
+        std::vector<std::pair<int, sockaddr_in> > Server;
         
         int server_socket;
         int server_bind;
