@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:16:39 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/12 17:23:13 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 13:25:41 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ class location
 		std::string 					autoindex;
 		long 							max_client_body_size;
 		std::map<int, std::string> 		error_page;
+
+
 		void set_uploade_path(std::string uploade_path);
 		void set_root(std::string root);
 		void set_index(std::vector<std::string> index);

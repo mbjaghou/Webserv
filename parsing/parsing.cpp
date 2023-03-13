@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 12:29:18 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 13:42:58 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ int pars::parssing_port(int port)
 	return (port);
 }
 
-location pars::parssing_location(std::vector<std::string> conf, int *count)
+location pars::parssing_location(std::vector<std::string> conf, int *count, pars_server server)
 {
 	std::vector<std::string> str = ft_split(conf[*count], " \t");
 	location loc;
@@ -228,8 +228,27 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 		*it++;
 		(*count)++;
 	}
+	loc = check_content_of_location(loc, server);
 	return (loc);
 }
+
+location pars::check_content_of_location(location loc, pars_server server)
+{
+	if (loc.root.size() == 0 && server.root.size() != 0)
+			loc.root = server.root;
+	if (loc.index.size() == 0 && server.index.size() != 0)
+		loc.index = server.index;
+	if (loc.allowed_methods.size() == 0 && server.allowed_methods.size() != 0)
+		loc.allowed_methods = server.allowed_methods;
+	if (loc.autoindex.size() == 0 && server.autoindex.size() != 0)
+		loc.autoindex = server.autoindex;
+	if (loc.max_client_body_size == 0 && server.max_client_body_size != 0)
+		loc.max_client_body_size = server.max_client_body_size;
+	if (loc.error_page.size() == 0 && server.error_page.size() != 0)
+		loc.error_page = server.error_page;
+	return (loc);
+}
+
 pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 {
 	std::vector<std::string> tmp;
@@ -363,7 +382,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		else if (tmp[0] == "\tlocation")
 		{
 			int move_step = *count;
-			server.location.push_back(parssing_location(conf, count));
+			server.location.push_back(parssing_location(conf, count, server));
 			it += *count - move_step;
 		}
 		else
