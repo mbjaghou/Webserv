@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:03 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/02/16 19:21:42 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 19:59:04 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
+#include "../parsing_hpp/parsing.hpp"
 class Request {
 private:
 	int									_Status;
@@ -27,15 +27,14 @@ private:
 	std::map<std::string, std::string>	_QueryMap;
 	std::vector<std::string>			_Body;
 	std::string							_Host;
-	// const ServerContext*				_Server;
+	const pars_server*					_Server;
 	std::map<int, std::string>			_ErrorPage;
 	std::string							_Index;
 	bool								_AutoIndex;
-	// const LocationContext*				_Location;
+	const location*				_Location;
 
 public:
-	// Request(std::string & buffer, ConfigFileParser const &config);
-    Request(std::string & buffer);
+	Request(std::string & buffer, pars const &config);
 	~Request();
     Request() {};
 
@@ -56,7 +55,7 @@ public:
 
 	void updatePath(const std::string & path);
 	void checkMethod(const std::string & path);
-	// bool findServer(std::vector<ServerContext> const & servers, std::string &buffer);
+	bool findServer(std::vector<pars_server> const & servers, std::string &buffer);
 	// const ServerContext& GetServerBlock() const;
 	const std::vector<std::string>& GetBody() const;
 	// const LocationContext &GetLocation() const;

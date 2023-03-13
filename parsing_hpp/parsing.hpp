@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 13:42:08 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 15:37:55 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ class pars
 		void check_content_if_empty(pars_server server);
 		pars_server parsing_servers(std::vector<std::string> conf, int *count);
 		location parssing_location(std::vector<std::string> conf, int *count, pars_server server);
-
 		location check_content_of_location(location loc, pars_server server);
     
 };

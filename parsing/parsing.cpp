@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 13:42:58 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 19:51:50 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,14 +174,14 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 		}
 		else if (tmp[0] == "return")
 		{
-			if (loc.return_page.size() != 0)
+			if (loc.return_page.first != 0 && loc.return_page.second.size() != 0)
 				throw std::runtime_error("Error return is duplicate location");
 			int status = atol(tmp[1].c_str());
-			if (status < 100 || status > 599)
+			if (status < 301 || status > 308)
 				throw std::runtime_error("Error in satatus code");
 			if (tmp.size() == 3)
 			{
-				loc.return_page.insert(std::make_pair(status, tmp[2]));
+				loc.return_page = std::make_pair(status, tmp[2]);
 			}
 			else
 				throw std::runtime_error("Error in error_page");
@@ -190,12 +190,10 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 		{
 			if (tmp.size() == 2)
 			{
-				if (loc.autoindex.size() != 0)
-					throw std::runtime_error("Error autoindex is duplicate location");
 				if (tmp[1] == "on")
-					loc.autoindex = tmp[1];
+					loc.autoindex = true;
 				else if (tmp[1] == "off")
-					loc.autoindex = tmp[1];
+					loc.autoindex = false;
 				else
 					throw std::runtime_error("Error in autoindex you must be add 'on' or 'off' in location");
 			}
@@ -240,8 +238,6 @@ location pars::check_content_of_location(location loc, pars_server server)
 		loc.index = server.index;
 	if (loc.allowed_methods.size() == 0 && server.allowed_methods.size() != 0)
 		loc.allowed_methods = server.allowed_methods;
-	if (loc.autoindex.size() == 0 && server.autoindex.size() != 0)
-		loc.autoindex = server.autoindex;
 	if (loc.max_client_body_size == 0 && server.max_client_body_size != 0)
 		loc.max_client_body_size = server.max_client_body_size;
 	if (loc.error_page.size() == 0 && server.error_page.size() != 0)
@@ -367,12 +363,10 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		{
 			if (tmp.size() == 2)
 			{
-				if (server.autoindex.size() != 0)
-					throw std::runtime_error("Error autoindex is duplicate");
 				if (tmp[1] == "on")
-					server.autoindex = tmp[1];
+					server.autoindex = true;
 				else if (tmp[1] == "off")
-					server.autoindex = tmp[1];
+					server.autoindex = false;
 				else
 					throw std::runtime_error("Error in autoindex you must be add 'on' or 'off'");
 			}

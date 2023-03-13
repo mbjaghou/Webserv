@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:05 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 13:25:58 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 19:30:52 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ std::vector<std::string> pars_server::get_allowed_methods(void)
 	return (allowed_methods);
 }
 
-std::string pars_server::get_autoindex(void)
+bool pars_server::get_autoindex(void)
 {
 	return (autoindex);
 }
@@ -81,7 +81,7 @@ void pars_server::set_allowed_methods(std::vector<std::string> allowed_methods)
 	this->allowed_methods = allowed_methods;
 }
 
-void pars_server::set_autoindex(std::string autoindex)
+void pars_server::set_autoindex(bool autoindex)
 {
 	this->autoindex = autoindex;
 }

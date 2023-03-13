@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/08 11:31:37 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 20:00:51 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ int server::select_socket(fd_set read_fd)
 
 int server::socket_server_start(void)
 {
-    
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         throw std::invalid_argument(strerror(errno));
     int opt = 1;
@@ -103,6 +102,7 @@ int server::start_server()
                     }
                     if (server_recv > 0)
                     {
+						// write(1, buffer, strlen(buffer));
                         std::string tmp = buffer;
                         Request o(tmp);
                         std::cout << o.getStatus() << '\n';
@@ -117,6 +117,8 @@ int server::start_server()
             }
         }
         server_send = send(server_accept, response.c_str(), response.size(), 0);
+        // server_send = send(server_accept, hello, strlen(hello), 0);
+
     }
     for (i = 0; i < FD_SETSIZE; i++)
     {

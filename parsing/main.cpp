@@ -36,8 +36,8 @@ int main(int ac, char **av)
 					std::cout << "location index: " << *it << std::endl;
 				for (std::map<int, std::string>::iterator it = pars.parssing[i].location[j].error_page.begin(); it != pars.parssing[i].location[j].error_page.end(); it++)
 					std::cout << "location error_page: " << it->first << " " << it->second << std::endl;
-				for (std::map<int, std::string>::iterator it = pars.parssing[i].location[j].return_page.begin(); it != pars.parssing[i].location[j].return_page.end(); it++)
-					std::cout << "location return_page: " << it->first << " " << it->second << std::endl;
+				std::cout << "location return: " << pars.parssing[i].location[j].return_page.first <<  " " <<  pars.parssing[i].location[j].return_page.second <<std::endl;
+
 				for(std::vector<std::string>::iterator it = pars.parssing[i].location[j].allowed_methods.begin(); it != pars.parssing[i].location[j].allowed_methods.end(); it++)
 					std::cout << "location allowed_methods: " << *it << std::endl;
 				std::cout << "location autoindex: " << pars.parssing[i].location[j].autoindex << std::endl;
