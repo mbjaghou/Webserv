@@ -13,11 +13,11 @@ int main(int ac, char **av)
 		int i = -1;
 		while (++i < pars.parssing.size())
 		{
+			for (std::map<std::string, long>::iterator it = pars.parssing[i].listen.begin(); it != pars.parssing[i].listen.end(); it++)
+				std::cout << "listen: " << it->first << " " << it->second << std::endl;
 			for (std::map<int, std::string>::iterator it = pars.parssing[i].error_page.begin(); it != pars.parssing[i].error_page.end(); it++)
 				std::cout << "error_page: " << it->first << " " << it->second << std::endl;
 			std::cout << "root: " << pars.parssing[i].get_root() << std::endl;
-			std::cout << "port: " << pars.parssing[i].get_port() << std::endl;
-			std::cout << "address: " << pars.parssing[i].get_address() << std::endl;
 			std::cout << "max_client_body_size: " << pars.parssing[i].get_max_client_body_size() << std::endl;
 			std::cout << "autoindex: " << pars.parssing[i].get_autoindex() << std::endl;
 			for (std::vector<std::string>::iterator it = pars.parssing[i].get_server_name().begin(); it != pars.parssing[i].get_server_name().end(); it++)

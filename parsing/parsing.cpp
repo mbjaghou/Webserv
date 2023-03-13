@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/12 20:05:46 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/13 12:29:18 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,8 +213,6 @@ location pars::parssing_location(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "error_page")
 		{
-			if (loc.error_page.size() != 0)
-				throw std::runtime_error("Error error_page is duplicate location");
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
 				throw std::runtime_error("Error in satatus code location");
@@ -272,16 +270,14 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 				{
 					if (str[0].find(".") != std::string::npos)
 						throw std::runtime_error("Error in listen");
-					server.address = "127.0.0.1";
-					server.port = parssing_port(atol(str[0].c_str()));
+					server.listen.insert(std::make_pair("127.0.0.1",  parssing_port(atol(str[0].c_str()))));
 				}
 				else
 				{
 					if (str[0] == "localhost")
-						server.address = "127.0.0.1";
+						server.listen.insert(std::make_pair("127.0.0.1", parssing_port(atol(str[1].c_str()))));
 					else
-						server.address = str[0];
-					server.port = parssing_port(atol(str[1].c_str()));;
+						server.listen.insert(std::make_pair(str[0], parssing_port(atol(str[1].c_str()))));
 				}
 			}
 				
@@ -313,14 +309,11 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		}
 		else if (tmp[0] == "\terror_page")
 		{
-			if (server.error_page.size() != 0)
-				throw std::runtime_error("Error error_page is duplicate");
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
 				throw std::runtime_error("Error in satatus code");
 			if (tmp.size() == 3)
 			{
-				// std::cout << "======== " << tmp[2] << std::endl;
 				server.error_page.insert(std::make_pair(status, tmp[2]));
 			}
 			else
@@ -385,14 +378,8 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 
 void pars::check_content_if_empty(pars_server server)
 {
-	if (server.port == 0)
-		throw std::runtime_error("must be add port");
-	if (server.root == "")
-		throw std::runtime_error("must be add root");
-	if (server.index.size() == 0)
-		throw std::runtime_error("must be add index");
-	if (server.allowed_methods.size() == 0)
-		throw std::runtime_error("must be add allowed_methods");	
+	if (server.listen.size() == 0)
+		throw std::runtime_error("must be add listen");	
 }
 
 void pars::parsing(int ac, char **av)
