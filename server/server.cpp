@@ -6,15 +6,25 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/14 12:58:30 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/14 15:21:44 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
-server::server()
+server::server(){std::cout << "\033[32m" << "Welcome to my server" << "\033[0m" << std::endl;}
+
+void server::stock_address_port(pars pars)
 {
-    std::cout << "\033[32m" << "Welcome to my server" << "\033[0m" << std::endl;
+	int j = -1;
+	while (++j < pars.parssing.size())
+	{	
+		for (std::multimap<std::string, long>::iterator it = pars.parssing[j].listen.begin(); it != pars.parssing[j].listen.end(); ++it)
+		{
+			std::cout << it->first << " => " << it->second << '\n';
+			server_listen.insert(std::pair<std::string, int>(it->first, it->second));
+		}
+	}
 }
 
 int server::select_socket(fd_set read_fd)
@@ -53,14 +63,17 @@ int server::socket_server_start(void)
     return (0);
 }
 
+
 int server::start_server(pars pars)
 {
     fd_set read_fd;
     int i;
     int addrlen = sizeof(addr);
     const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
-
     std::string response;
+	
+
+	stock_address_port(pars);
     if (socket_server_start())
         return (1);
     for(i = 0; i < FD_SETSIZE; i++)

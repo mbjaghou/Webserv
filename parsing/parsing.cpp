@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 19:51:50 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/14 15:20:16 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -397,6 +397,12 @@ void pars::check_content_if_empty(pars_server server)
 
 void pars::parsing(int ac, char **av)
 {
+	if (ac == 1)
+	{
+		std::cout << "config file not found, use default config file" << std::endl;
+		av[1] = (char *)"../config_files/config.conf"; 
+		ac++;
+	}
 	if (ac != 2)
         throw std::invalid_argument("Error whit the argment");
 	open_file_read(av);

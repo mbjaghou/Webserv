@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/14 11:31:52 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/14 15:09:14 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@ class server
     private:
         //attrbuite
         struct sockaddr_in addr;
-        std::vector<std::pair<int, sockaddr_in> > Server;
-        
         int server_socket;
         int server_bind;
         int server_lesten;
@@ -48,9 +46,12 @@ class server
         
     public:
         //membre fuction
+        std::vector<std::pair<int, sockaddr_in> > Server;
+        std::multimap<std::string, int> 		  server_listen;
         server();
         int socket_server_start(void);
         int select_socket(fd_set read_fd);
+		void stock_address_port(pars pars);
         int start_server(pars pars);
 };
 #endif

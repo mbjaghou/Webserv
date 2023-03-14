@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:15 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 19:30:28 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/14 14:47:21 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class pars_server
 		long 										max_client_body_size;
 		std::vector<std::string> 					allowed_methods;
 		std::vector<location> 	 					location;
-		bool 								autoindex;
+		bool 										autoindex;
 		std::multimap<std::string, long>			listen;
 
 
