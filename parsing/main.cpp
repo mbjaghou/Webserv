@@ -1,7 +1,5 @@
 #include "../parsing_hpp/parsing.hpp"
 
-
-
 int main(int ac, char **av)
 {
     try 

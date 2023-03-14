@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/13 19:57:41 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/14 14:39:20 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,12 @@ bool	Request::findServer(std::vector<pars_server> const & servers, std::string &
 		std::multimap<std::string, long> listeners = servers[i].listen;
 		std::multimap<std::string, long>::iterator it;
 		for (it = listeners.begin(); it!= listeners.end(); ++it) {
-			if (((it->second + ":" + it->first) == _Host) || (it->second == stoi(_Host) && it->first == "80")) {
+			std::stringstream str;
+			str << it->second;
+			std::string host = it->first + ":" + str.str();
+			if ((host == _Host) || (it->first == _Host && it->second == 80)) {
 				_Server = &servers[i];
+				std::cout << "server found" << std::endl;
 				return true;
 			}
 		}
@@ -93,7 +97,7 @@ void Request::updatePath(const std::string & path) {
 	for (i = 0; i < locations.size(); ++i){
 		enter = true;
 		if (!strncmp(locations[i].uploade_path.c_str(), path.c_str(), locations[i].uploade_path.size())) {
-			if (!locations[i].return_page.first == 0 && locations[i].uploade_path == path) {
+			if (locations[i].return_page.first == 0 && locations[i].uploade_path == path) {
 				_Status = locations[i].return_page.first;
 				_Headers["Location"] = locations[i].return_page.second;
 			}
@@ -165,7 +169,7 @@ void Request::ParseStartLine(std::string & str) {
 		if (StartLine[1].size() > 2000)
 			_Status = URITooLong;
 		std::vector<std::string> RequestTarget = ft_split(StartLine[1], "?");
-		// updatePath(RequestTarget[0]);
+		updatePath(RequestTarget[0]);
 		if (_Status >= 300 && _Status < 400) return;
 		if (pathIsFile(_Path) == 1) {
 			std::fstream check(_Path);
@@ -285,17 +289,10 @@ bool Request::getAutoIndex() const {
 	return _AutoIndex;
 }
 
-// const ServerContext& Request::GetServerBlock() const {
-// 	return *_Server;
-// }
-
 const std::vector<std::string>& Request::GetBody() const {
 	return _Body;
 }
 
-// const LocationContext &Request::GetLocation() const {
-// 	return *_Location;
-// }
 const std::string &Request::GetMethod() const {
 	return _Method;
 }

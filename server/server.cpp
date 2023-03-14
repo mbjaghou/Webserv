@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 20:00:51 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/14 12:58:30 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int server::socket_server_start(void)
     return (0);
 }
 
-int server::start_server()
+int server::start_server(pars pars)
 {
     fd_set read_fd;
     int i;
@@ -104,10 +104,10 @@ int server::start_server()
                     {
 						// write(1, buffer, strlen(buffer));
                         std::string tmp = buffer;
-                        Request o(tmp);
+                        Request o(tmp, pars);
                         std::cout << o.getStatus() << '\n';
                         Response res(o);
-                        response = res.sendFile("/Users/mbjaghou/Desktop/Webserv/server/main.cpp");
+                        response = res.sendDir(o.getPath().c_str(), o.getHost());
                     }
                     if (server_recv == -1)
                     {

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 15:05:14 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/14 11:31:52 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 #include <exception>
 #include "./../headers/http/Request.hpp"
 #include "./../headers/http/Response.hpp"
-
+#include "../parsing_hpp/parsing.hpp"
 #include <vector>
 class server
 {
@@ -51,6 +51,6 @@ class server
         server();
         int socket_server_start(void);
         int select_socket(fd_set read_fd);
-        int start_server();
+        int start_server(pars pars);
 };
 #endif
