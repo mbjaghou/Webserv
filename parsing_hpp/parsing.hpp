@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 15:37:55 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/15 14:31:46 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ class pars
 		void parsing(int ac, char **av);
 		int parssing_port(int port);
 		void check_content_if_empty(pars_server server);
-		pars_server parsing_servers(std::vector<std::string> conf, int *count);
-		location parssing_location(std::vector<std::string> conf, int *count, pars_server server);
+		pars_server parsing_servers(std::vector<std::string> conf, size_t *count);
+		location parssing_location(std::vector<std::string> conf, size_t *count, pars_server server);
 		location check_content_of_location(location loc, pars_server server);
     
 };

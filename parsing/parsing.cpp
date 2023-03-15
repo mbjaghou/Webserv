@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/14 15:20:16 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/15 15:17:35 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ std::vector<std::string> ft_split(const std::string &str, const char *del) {
 
 void pars::check_bracket(std::string str)
 {
-    int bracket;
-    int bracket1;
+    int bracket = 0;
+    int bracket1 = 0;
     
     int i = -1;
     while (str[++i] != '\0')
@@ -61,7 +61,7 @@ void pars::parsing_config(std::string line)
 	for(; line[i] == ' ' || line[i] == '\t'; i--);
 	line.erase(i + 1);
 	
-	int j = line.find_last_of(";{}");
+	size_t j = line.find_last_of(";{}");
 	if (j != line.size() - 1)
 		throw std::runtime_error("Error: find another char after ';' Or ';' is missing");
     if (line[0] && line[0] != '\n')
@@ -94,7 +94,7 @@ void pars::stock_data(void)
 
 	if (config.end() == config.begin())
 		throw std::runtime_error("Error: config file is empty");
-	int count = 0;
+	size_t count = 0;
 	while (count < config.size())
 	{
 		std::vector<std::string> tmp = ft_split(config[count], " \t");
@@ -114,7 +114,7 @@ int pars::parssing_port(int port)
 	return (port);
 }
 
-location pars::parssing_location(std::vector<std::string> conf, int *count, pars_server server)
+location pars::parssing_location(std::vector<std::string> conf, size_t *count, pars_server server)
 {
 	std::vector<std::string> str = ft_split(conf[*count], " \t");
 	location loc;
@@ -149,7 +149,7 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 				throw std::runtime_error("Error index is duplicate location");
 			if (tmp.size() == 1)
 				throw std::runtime_error("Error in index location");
-			int i = 1;
+			size_t i = 1;
 			while (i < tmp.size())
 			{
 				loc.index.push_back(tmp[i]);
@@ -164,7 +164,7 @@ location pars::parssing_location(std::vector<std::string> conf, int *count, pars
 			{
 				if (loc.allowed_methods.size() != 0)
 					throw std::runtime_error("Error in allowed_methods is duplicate location");
-				int i = 1;
+				size_t i = 1;
 				while (i < tmp.size())
 				{
 					loc.allowed_methods.push_back(tmp[i]);
@@ -245,7 +245,7 @@ location pars::check_content_of_location(location loc, pars_server server)
 	return (loc);
 }
 
-pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
+pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 {
 	std::vector<std::string> tmp;
 	pars_server server;
@@ -267,7 +267,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 		{
 			if (server.server_name.size() != 0)
 				throw std::runtime_error("Error server_name is duplicate");
-			int i = 1;
+			size_t i = 1;
 			while (i < tmp.size())
 			{
 				server.server_name.push_back(tmp[i]);
@@ -315,7 +315,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 				throw std::runtime_error("Error index is duplicate");
 			if (tmp.size() == 1)
 				throw std::runtime_error("Error in index");
-			int i = 1;
+			size_t i = 1;
 			while (i < tmp.size())
 			{
 				server.index.push_back(tmp[i]);
@@ -351,7 +351,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, int *count)
 			{
 				if (server.allowed_methods.size() != 0)
 					throw std::runtime_error("Error in allowed_methods is duplicate");
-				int i = 1;
+				size_t i = 1;
 				while (i < tmp.size())
 				{
 					server.allowed_methods.push_back(tmp[i]);
@@ -400,7 +400,7 @@ void pars::parsing(int ac, char **av)
 	if (ac == 1)
 	{
 		std::cout << "config file not found, use default config file" << std::endl;
-		av[1] = (char *)"../config_files/config.conf"; 
+		av[1] = (char *)"./config_files/config.conf"; 
 		ac++;
 	}
 	if (ac != 2)

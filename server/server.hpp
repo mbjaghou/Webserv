@@ -6,14 +6,13 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/14 15:09:14 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/15 18:07:26 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#define PORT 8080
 #define BUFFER 50000
 
 #include <iostream>
@@ -35,11 +34,7 @@ class server
         //attrbuite
         struct sockaddr_in addr;
         int server_socket;
-        int server_bind;
-        int server_lesten;
         int server_accept;
-        int connection[FD_SETSIZE];
-        int server_select;
         ssize_t server_send;
         ssize_t server_recv;
         char buffer[BUFFER];
@@ -47,7 +42,7 @@ class server
     public:
         //membre fuction
         std::vector<std::pair<int, sockaddr_in> > Server;
-        std::multimap<std::string, int> 		  server_listen;
+        std::multimap<std::string, long> 		  server_listen;
         server();
         int socket_server_start(void);
         int select_socket(fd_set read_fd);

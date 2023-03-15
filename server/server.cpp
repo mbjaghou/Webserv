@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/14 15:21:44 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/15 18:35:20 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ server::server(){std::cout << "\033[32m" << "Welcome to my server" << "\033[0m" 
 
 void server::stock_address_port(pars pars)
 {
-	int j = -1;
+	size_t j = -1;
 	while (++j < pars.parssing.size())
 	{	
 		for (std::multimap<std::string, long>::iterator it = pars.parssing[j].listen.begin(); it != pars.parssing[j].listen.end(); ++it)
@@ -29,6 +29,7 @@ void server::stock_address_port(pars pars)
 
 int server::select_socket(fd_set read_fd)
 {
+	int server_select;
     server_select = select(FD_SETSIZE, &read_fd, NULL, NULL, NULL);
     if (server_select < 0)
     {
@@ -40,26 +41,41 @@ int server::select_socket(fd_set read_fd)
 
 int server::socket_server_start(void)
 {
-    if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-        throw std::invalid_argument(strerror(errno));
-    int opt = 1;
-    if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
-       throw std::invalid_argument("Error address socket is already used");
-    fcntl(server_socket, F_SETFL, O_NONBLOCK);
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(PORT);
-    memset(addr.sin_zero, '\0', sizeof addr.sin_zero);
-    if (( server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr))) < 0)
-    {
-        throw std::invalid_argument(strerror(errno));
-        ::close(server_socket);
-    }
-    if (( server_lesten = listen(server_socket, SOMAXCONN)) < 0)
-    { 
-        throw std::invalid_argument(strerror(errno));
-        ::close(server_socket);
-    }
+	for (std::multimap<std::string, long>::iterator it = server_listen.begin(); it != server_listen.end(); ++it)
+	{
+		if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+			throw std::invalid_argument(strerror(errno));
+		int opt = 1;
+		if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
+			throw std::invalid_argument("Error address socket is already used");
+		fcntl(server_socket, F_SETFL, O_NONBLOCK);
+		bzero(&this->addr, sizeof(this->addr));
+		addr.sin_family = AF_INET;
+		addr.sin_addr.s_addr = inet_addr(it->first.c_str());
+		addr.sin_port = htons(it->second);
+		memset(addr.sin_zero, 0, sizeof addr.sin_zero);
+		 int server_bind;
+		if ((server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr))) < 0)
+		{
+			throw std::invalid_argument(strerror(errno));
+			::close(server_socket);
+		}
+		int server_lesten;
+		if ((server_lesten = listen(server_socket, SOMAXCONN)) < 0)
+		{ 
+			throw std::invalid_argument(strerror(errno));
+			::close(server_socket);
+		}
+		std::pair<int, sockaddr_in> pair = std::make_pair(server_socket, addr);
+		Server.push_back(pair);
+		server_socket = 0;
+	}
+	// for(std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
+	// {
+	// 	std::cout << "server_socket: " << it->first << std::endl;
+	// 	std::cout << "server_addr: " << it->second.sin_addr.s_addr << std::endl;
+	// 	std::cout << "server_port: " << it->second.sin_port << std::endl;
+	// }
     return (0);
 }
 
@@ -67,10 +83,11 @@ int server::socket_server_start(void)
 int server::start_server(pars pars)
 {
     fd_set read_fd;
-    int i;
-    int addrlen = sizeof(addr);
-    const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
+	fd_set write_fd;
+    //const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
     std::string response;
+	int connection[FD_SETSIZE];
+    int i;
 	
 
 	stock_address_port(pars);
@@ -78,10 +95,17 @@ int server::start_server(pars pars)
         return (1);
     for(i = 0; i < FD_SETSIZE; i++)
          connection[i] = -1;
-    connection[0] = server_socket;
-    while (1)
-    {
-        FD_ZERO(&read_fd);
+	std::vector<std::pair<int, sockaddr_in> >::iterator it;
+	int b = 0;
+	for (it = Server.begin(); it != Server.end(); ++it, ++b)
+		connection[b] = it->first;
+	//int stock = 0;
+	FD_ZERO(&read_fd);
+	FD_ZERO(&write_fd);
+	
+	while (1)
+	{
+		int addrlen = sizeof(addr);
         for (i = 0; i < FD_SETSIZE;++i)
         {
             if (connection[i] >= 0)
@@ -142,3 +166,4 @@ int server::start_server(pars pars)
         }
     }
 }
+
