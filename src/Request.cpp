@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/15 18:36:16 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/16 15:55:26 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ bool	Request::findServer(std::vector<pars_server> const & servers, std::string &
 			std::string host = it->first + ":" + str.str();
 			if ((host == _Host) || (it->first == _Host && it->second == 80)) {
 				_Server = &servers[i];
-				std::cout << "server found" << std::endl;
 				return true;
 			}
 		}
@@ -97,7 +96,7 @@ void Request::updatePath(const std::string & path) {
 	for (i = 0; i < locations.size(); ++i){
 		enter = true;
 		if (!strncmp(locations[i].uploade_path.c_str(), path.c_str(), locations[i].uploade_path.size())) {
-			if (locations[i].return_page.first == 0 && locations[i].uploade_path == path) {
+			if (locations[i].return_page.first != 0 && locations[i].uploade_path == path) {
 				_Status = locations[i].return_page.first;
 				_Headers["Location"] = locations[i].return_page.second;
 			}

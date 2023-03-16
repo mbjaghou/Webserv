@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/16 14:14:25 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/16 16:22:58 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@ void server::stock_address_port(pars pars)
 	}
 }
 
-int server::select_socket(fd_set read_fd)
+int server::select_socket(fd_set read_fd , int max)
 {
 	int server_select;
-    server_select = select(FD_SETSIZE, &read_fd, NULL, NULL, NULL);
+    server_select = select(max + 1, &read_fd, NULL, NULL, NULL);
     if (server_select < 0)
     {
         throw std::invalid_argument(strerror(errno));
@@ -79,8 +79,8 @@ int server::start_server(pars pars)
     fd_set read_fd;
     std::string response;
 	int accepted[FD_SETSIZE];
+	const char *hello = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello world\n";
     int i;
-	
 
 	stock_address_port(pars);
     if (socket_server_start())
@@ -90,9 +90,21 @@ int server::start_server(pars pars)
 	while (1)
 	{
 		FD_ZERO(&read_fd);
+		int max;
 		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
+		{
 			FD_SET(it->first, &read_fd);
-        select_socket(read_fd);
+			max = it->first;
+		}
+		for (i = 0; i < FD_SETSIZE; ++i)
+		{
+			int sd = accepted[i];
+			if (sd > 0)
+				FD_SET(sd, &read_fd);
+			if (sd > max)
+				max = sd;
+		}
+        select_socket(read_fd, max);
 		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
 		{
 			if (FD_ISSET(it->first, &read_fd))
@@ -105,7 +117,6 @@ int server::start_server(pars pars)
 						if (accepted[j] < 0)
 						{
 							accepted[j] = server_accept;
-							FD_SET(accepted[j], &read_fd);
 							break ;
 						}
 					}
@@ -114,35 +125,45 @@ int server::start_server(pars pars)
 		}
     	for (i = 0; i < FD_SETSIZE; ++i)
     	{
-    	    if (accepted[i] > 0 && FD_ISSET(accepted[i], &read_fd))
-    	    {
-    	        server_recv = recv(accepted[i], buffer, BUFFER, 0);
-    	        if (server_recv == 0)
-    	        {
-    	            ::close(accepted[i]);
-    	            accepted[i] = -1;
-    	        }
-    	        else
-    	        {
-    	            std::string tmp = buffer;
-    	            Request o(tmp, pars);
-    	            std::cout << o.getStatus() << '\n';
-    	            Response res(o);
-    	            response = res.sendDir(o.getPath().c_str(), o.getHost());
-    				send(accepted[i], response.c_str(), response.size(), 0);
-    	        }
+			int sd = accepted[i];
+			try {
+				if (sd > 0 && FD_ISSET(sd, &read_fd))
+				{
+					server_recv = recv(sd, buffer, BUFFER, 0);
+					if (server_recv == 0)
+					{
+						accepted[i] = -1;
+						::close(sd);
+						continue;
+					}
+					else if (server_recv < 0)
+						throw std::invalid_argument(strerror(errno));
+					else if (server_recv > 0)
+					{
+						std::string tmp = buffer;
+						Request o(tmp, pars);
+						Response res(o);
+						if (o.getPath() == "/favicon.ico") {
+							send(sd, hello, strlen(hello), 0);
+							std::cout << "hello" << std::endl;
+						}
+						else {
+							response = res.sendDir(o.getPath().c_str(), o.getHost());
+							int send_res = send(sd, response.c_str(), response.size(), 0);
+							if (send_res < 0)
+								throw std::invalid_argument(strerror(errno));
+							else if (send_res == 0)
+								continue ;						
+						}
+					}
+				}
     	    }
-			
+			catch (std::exception &e) {
+				std::cout << e.what() << std::endl;
+				::close(sd);
+				accepted[i] = -1;
+			}
     	}
 	
 	}
 }
-        // server_send = send(server_accept, hello, strlen(hello), 0);
-    // for (i = 0; i < FD_SETSIZE; i++)
-    // {
-    //     if (accepted[i] > 0)
-    //     {
-    //         FD_CLR(accepted[i], &read_fd);
-    //         ::close(accepted[i]);
-    //     }
-    // }

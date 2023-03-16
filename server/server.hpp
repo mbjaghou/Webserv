@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/16 13:04:07 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/16 15:35:49 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class server
         std::multimap<std::string, long> 		  server_listen;
         server();
         int socket_server_start(void);
-        int select_socket(fd_set read_fd);
+        int select_socket(fd_set read_fd, int max);
 		void stock_address_port(pars pars);
         int start_server(pars pars);
 };
