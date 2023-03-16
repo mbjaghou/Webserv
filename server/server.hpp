@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/15 18:07:26 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/16 13:04:07 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ class server
         struct sockaddr_in addr;
         int server_socket;
         int server_accept;
-        ssize_t server_send;
         ssize_t server_recv;
         char buffer[BUFFER];
         

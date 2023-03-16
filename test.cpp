@@ -1,113 +1,127 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <string.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <sys/select.h>
 
-const int PORT = 8080;
-const int MAX_CLIENTS = 10;
+#define PORT 8080
+#define MAX_CLIENTS 10
+#define BUFFER_SIZE 1024
 
-int main() {
-    // Step 1: Create and bind the server socket.
-    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket == -1) {
-        perror("socket");
-        return 1;
-    }
-    sockaddr_in server_address = {};
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
-    server_address.sin_port = htons(PORT);
-    if (bind(server_socket, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
-        perror("bind");
-        return 1;
-    }
+int main(int argc, char const *argv[]) {
 
-    // Step 2: Listen for incoming connections.
-    if (listen(server_socket, MAX_CLIENTS) == -1) {
-        perror("listen");
-        return 1;
+    int server_socket, client_socket[MAX_CLIENTS], max_clients = MAX_CLIENTS;
+    struct sockaddr_in server_addr, client_addr;
+    fd_set readfds; // file descriptor set for select()
+    char buffer[BUFFER_SIZE] = {0};
+    int activity, valread, i, addrlen = sizeof(client_addr);
+
+    // create server socket
+    if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        std::cerr << "Socket creation failed" << std::endl;
+        return -1;
     }
 
-    // Step 3: Create the set of monitored file descriptors.
-    fd_set read_fds, write_fds;
-    FD_ZERO(&read_fds);
-    FD_ZERO(&write_fds);
-    FD_SET(server_socket, &read_fds);
+    // set server socket options
+    // int opt = 1;
+    // if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
+    //     std::cerr << "setsockopt failed" << std::endl;
+    //     return -1;
+    // }
 
-    // Step 4: Enter the main loop that waits for events.
-    std::vector<int> clients;
+    // set server address
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+
+    // bind server socket to address
+    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        std::cerr << "Bind failed" << std::endl;
+        return -1;
+    }
+
+    // listen for client connections
+    if (listen(server_socket, 3) < 0) {
+        std::cerr << "Listen failed" << std::endl;
+        return -1;
+    }
+
+    // initialize client sockets to 0
+    for (i = 0; i < max_clients; i++) {
+        client_socket[i] = 0;
+    }
+
     while (true) {
-        fd_set read_fds_copy = read_fds;
-        fd_set write_fds_copy = write_fds;
-        if (select(FD_SETSIZE, &read_fds_copy, &write_fds_copy, nullptr, nullptr) == -1) {
-            perror("select");
-            return 1;
+        // clear the file descriptor set
+        FD_ZERO(&readfds);
+
+        // add server socket to file descriptor set
+        FD_SET(server_socket, &readfds);
+        int max_sd = server_socket;
+
+        // add client sockets to file descriptor set
+        for (i = 0; i < max_clients; i++) {
+            int sd = client_socket[i];
+
+            if (sd > 0) {
+                FD_SET(sd, &readfds);
+            }
+
+            if (sd > max_sd) {
+                max_sd = sd;
+            }
         }
 
-        // Step 5: Handle the events.
-        for (int fd = 0; fd < FD_SETSIZE; ++fd) {
-            if (FD_ISSET(fd, &read_fds_copy)) {
-                if (fd == server_socket) {
-                    // Step 6: Accept a new incoming connection.
-                    sockaddr_in client_address = {};
-                    socklen_t client_address_size = sizeof(client_address);
-                    int client_socket = accept(server_socket, (sockaddr*)&client_address, &client_address_size);
-                    if (client_socket == -1) {
-                        perror("accept");
-                        continue;
-                    }
-                    std::cout << "New client connected: " << inet_ntoa(client_address.sin_addr) << std::endl;
-                    FD_SET(client_socket, &read_fds);
-                    clients.push_back(client_socket);
-                } else {
-                    // Step 7: Handle data from an existing client.
-                    char buffer[1024];
-                    int bytes_received = recv(fd, buffer, sizeof(buffer), 0);
-                    if (bytes_received == -1) {
-                        perror("recv");
-                        close(fd);
-                        FD_CLR(fd, &read_fds);
-                        FD_CLR(fd, &write_fds);
-                        clients.erase(std::remove(clients.begin(), clients.end(), fd), clients.end());
-                        continue;
-                    }
-                    if (bytes_received == 0) {
-                        std::cout << "Client disconnected" << std::endl;
-                        close(fd);
-                        FD_CLR(fd, &read_fds);
-                        FD_CLR(fd, &write_fds);
-                        clients.erase(std::remove(clients.begin(), clients.end(), fd), clients.end());
-                        continue;
-                    }
-                    std::cout << "Received " << bytes_received << " bytes from client" << std::endl;
+        // wait for activity on any of the sockets
+        activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
 
-                    // Step 8: Send a response if necessary.
-                    if (FD_ISSET(fd, &write_fds_copy)) {
-                        const char* response = "Hello, client!";
-                        int bytes_sent = send(fd, response, strlen(response), 0);
-                        if (bytes_sent == -1) {
-                            perror("send");
-                            close(fd);
-                            FD_CLR(fd, &read_fds);
-                            FD_CLR(fd, &write_fds);
-                            clients.erase(std::remove(clients.begin(), clients.end(), fd), clients.end());
-                            continue;
-                        }
-                        std::cout << "Sent " << bytes_sent << " bytes to client" << std::endl;
-                    }
+        if (activity < 0) {
+            std::cerr << "Select error" << std::endl;
+            return -1;
+        }
+
+        // handle new client connections
+        if (FD_ISSET(server_socket, &readfds)) {
+            int new_socket;
+
+            if ((new_socket = accept(server_socket, (struct sockaddr *)&client_addr, (socklen_t*)&addrlen)) < 0) {
+                std::cerr << "Accept error" << std::endl;
+                return -1;
+            }
+
+            // add new socket to array of client sockets
+            for (i = 0; i < max_clients; i++) {
+                if (client_socket[i] == 0) {
+                    client_socket[i] = new_socket;
+                    std::cout << "New client connected";
+					break;
                 }
             }
         }
 
-        // Step 9: Set the write file descriptors for clients that have data to send.
-        for (int fd : clients) {
-            if (FD_ISSET(fd, &read_fds) && !FD_ISSET(fd, &write_fds)) {
-                FD_SET(fd, &write_fds);
+        // handle incoming data from clients
+        for (i = 0; i < max_clients; i++) {
+            int sd = client_socket[i];
+
+            if (FD_ISSET(sd, &readfds)) {
+                valread = read(sd, buffer, BUFFER_SIZE);
+
+                if (valread == 0) {
+                    // client disconnected
+                    std::cout << "Client disconnected" << std::endl;
+                    close(sd);
+                    client_socket[i] = 0;
+                } else {
+                    // handle client message
+                    std::cout << "Message received: " << buffer << std::endl;
+                    // do something with the message
+                    char response[] = "Server response";
+            		send(sd, response, strlen(response), 0);
+
+                }
             }
         }
     }

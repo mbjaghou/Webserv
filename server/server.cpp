@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/15 18:35:20 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/16 14:14:25 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,12 +70,6 @@ int server::socket_server_start(void)
 		Server.push_back(pair);
 		server_socket = 0;
 	}
-	// for(std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
-	// {
-	// 	std::cout << "server_socket: " << it->first << std::endl;
-	// 	std::cout << "server_addr: " << it->second.sin_addr.s_addr << std::endl;
-	// 	std::cout << "server_port: " << it->second.sin_port << std::endl;
-	// }
     return (0);
 }
 
@@ -83,87 +77,72 @@ int server::socket_server_start(void)
 int server::start_server(pars pars)
 {
     fd_set read_fd;
-	fd_set write_fd;
-    //const char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 14\n\nLife word Life";
     std::string response;
-	int connection[FD_SETSIZE];
+	int accepted[FD_SETSIZE];
     int i;
 	
 
 	stock_address_port(pars);
     if (socket_server_start())
         return (1);
-    for(i = 0; i < FD_SETSIZE; i++)
-         connection[i] = -1;
-	std::vector<std::pair<int, sockaddr_in> >::iterator it;
-	int b = 0;
-	for (it = Server.begin(); it != Server.end(); ++it, ++b)
-		connection[b] = it->first;
-	//int stock = 0;
-	FD_ZERO(&read_fd);
-	FD_ZERO(&write_fd);
-	
+	for(i = 0; i < FD_SETSIZE; i++)
+         accepted[i] = -1;
 	while (1)
 	{
-		int addrlen = sizeof(addr);
-        for (i = 0; i < FD_SETSIZE;++i)
-        {
-            if (connection[i] >= 0)
-                FD_SET(connection[i], &read_fd);
-        }
-        if (!select_socket(read_fd))
-        {
-            if (FD_ISSET(server_socket, &read_fd))
-            {
-                if((server_accept = accept(server_socket, (struct sockaddr *)&addr, (socklen_t*)&addrlen)) >= 0)
-                {
-                    for (i = 0; i < FD_SETSIZE; ++i)
-                    {
-                        if (connection[i] < 0)
-                        {
-                            connection[i] = server_accept;
-                            break ;
-                        }
-                    }
-                }
-            }
-            for (i = 1; i < FD_SETSIZE; ++i)
-            {   
-                if (connection[i] > 0 && FD_ISSET(connection[i], &read_fd))
-                {
-                    server_recv = recv(connection[i], buffer, BUFFER, 0);
-                    if (server_recv == 0)
-                    {
-                        ::close(connection[i]);
-                        connection[i] = -1;
-                    }
-                    if (server_recv > 0)
-                    {
-						// write(1, buffer, strlen(buffer));
-                        std::string tmp = buffer;
-                        Request o(tmp, pars);
-                        std::cout << o.getStatus() << '\n';
-                        Response res(o);
-                        response = res.sendDir(o.getPath().c_str(), o.getHost());
-                    }
-                    if (server_recv == -1)
-                    {
-                        continue;   
-                    }
-                }
-            }
-        }
-        server_send = send(server_accept, response.c_str(), response.size(), 0);
-        // server_send = send(server_accept, hello, strlen(hello), 0);
-
-    }
-    for (i = 0; i < FD_SETSIZE; i++)
-    {
-        if (connection[i] > 0)
-        {
-            FD_CLR(connection[i], &read_fd);
-            ::close(connection[i]);
-        }
-    }
+		FD_ZERO(&read_fd);
+		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
+			FD_SET(it->first, &read_fd);
+        select_socket(read_fd);
+		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
+		{
+			if (FD_ISSET(it->first, &read_fd))
+			{
+				if((server_accept = accept(it->first, NULL, NULL)) >= 0)
+				{
+					int j;
+					for (j = 0; j < FD_SETSIZE; j++)
+					{
+						if (accepted[j] < 0)
+						{
+							accepted[j] = server_accept;
+							FD_SET(accepted[j], &read_fd);
+							break ;
+						}
+					}
+				}
+			}
+		}
+    	for (i = 0; i < FD_SETSIZE; ++i)
+    	{
+    	    if (accepted[i] > 0 && FD_ISSET(accepted[i], &read_fd))
+    	    {
+    	        server_recv = recv(accepted[i], buffer, BUFFER, 0);
+    	        if (server_recv == 0)
+    	        {
+    	            ::close(accepted[i]);
+    	            accepted[i] = -1;
+    	        }
+    	        else
+    	        {
+    	            std::string tmp = buffer;
+    	            Request o(tmp, pars);
+    	            std::cout << o.getStatus() << '\n';
+    	            Response res(o);
+    	            response = res.sendDir(o.getPath().c_str(), o.getHost());
+    				send(accepted[i], response.c_str(), response.size(), 0);
+    	        }
+    	    }
+			
+    	}
+	
+	}
 }
-
+        // server_send = send(server_accept, hello, strlen(hello), 0);
+    // for (i = 0; i < FD_SETSIZE; i++)
+    // {
+    //     if (accepted[i] > 0)
+    //     {
+    //         FD_CLR(accepted[i], &read_fd);
+    //         ::close(accepted[i]);
+    //     }
+    // }
