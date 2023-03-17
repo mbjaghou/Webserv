@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/17 13:02:21 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 15:15:03 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,23 @@ bool	Request::findServer(std::vector<pars_server> const & servers, std::string &
 			if ((host == _Host) || (it->first == _Host && it->second == 80)) {
 				_Server = &servers[i];
 				return true;
+			}
+			else {
+				std::size_t pos = _Host.find(":");
+				if (pos != std::string::npos) {
+					std::string host = _Host.substr(0, pos);
+					int port = atoi(_Host.substr(pos + 1, _Host.size() - pos).c_str());
+					for (size_t j = 0; j < servers[i].server_name.size(); j++) {
+						if (servers[i].server_name[j] == host) {
+							for (std::multimap<std::string, long>::const_iterator it = servers[i].listen.begin(); it != servers[i].listen.end(); ++it) {
+								if (port == it->second) {
+									_Server = &servers[i];
+									return true;
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

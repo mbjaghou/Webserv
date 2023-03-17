@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/17 13:00:29 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 14:21:04 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,8 @@ int server::socket_server_start(void)
 int server::start_server(pars pars)
 {
     fd_set read_fd;
-    std::string response;
+	fd_set write_fd;
+    std::vector<std::string> response(FD_SETSIZE);
 	int accepted[FD_SETSIZE];
 	// const char *hello = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello world\n";
     int i;
@@ -91,6 +92,7 @@ int server::start_server(pars pars)
 	while (1)
 	{
 		FD_ZERO(&read_fd);
+		FD_ZERO(&write_fd);
 		int max;
 		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
 		{
@@ -101,12 +103,15 @@ int server::start_server(pars pars)
 		{
 			int sd = accepted[i];
 			if (sd > 0)
+			{
 				FD_SET(sd, &read_fd);
+				FD_SET(sd, &write_fd);
+			}
 			if (sd > max)
 				max = sd;
 		}
         int server_select;
-		server_select = select(max + 1, &read_fd, NULL, NULL, NULL);
+		server_select = select(max + 1, &read_fd, &write_fd, NULL, NULL);
 		if (server_select < 0)
     		throw std::invalid_argument(strerror(errno));
 		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
@@ -138,6 +143,7 @@ int server::start_server(pars pars)
 					{
 						accepted[i] = -1;
 						::close(sd);
+						response[i].clear();
 						continue;
 					}
 					else if (server_recv < 0)
@@ -148,31 +154,46 @@ int server::start_server(pars pars)
 						Request req(tmp, pars);
 						Response res(req);
 						if (res.getStatus() != OK)
-							response = res.sendErrorPage(res.getStatus());
+							response[i] = res.sendErrorPage(res.getStatus());
 						// else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)
-						// 	response = res.uploadFile();
+						// 	response[i] = res.uploadFile();
 						// else if (req.GetMethod() == "DELETE")
-						// 	response = res.deleteFile(req.getPath());
+						// 	response[i] = res.deleteFile(req.getPath());
 						else if (!pathIsFile(req.getPath())) {
 							// if (req.GetLocation().GetCGI().GetFilePath().compare("") != 0)
-							// 		response = res.cgi(req);
+							// 		response[i] = res.cgi(req);
 							// else
-							response = res.sendDir(req.getPath().c_str(), req.getHost());
+							response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
 						}
 						else
-							response = res.sendFile(req.getPath());
+							response[i] = res.sendFile(req.getPath());
 					}
-					int valsent = send(sd, response.c_str(), response.size(), 0);
-					if (valsent == 0)
-						continue;
-					else if (valsent < 0)
-						throw std::runtime_error("couldn't send the response");
+				}
+				if (sd > 0 && FD_ISSET(sd, &write_fd))
+				{
+					if (response[i] != "") {
+						size_t len = 65000;
+						if (response[i].size() < len)
+							len = response[i].size();
+						int valsent = send(sd, response[i].c_str(), len, 0);
+						if (valsent == 0)
+							continue;
+						else if (valsent < 0)
+							throw std::runtime_error("couldn't send the response");
+						response[i].assign(response[i].begin() + len, response[i].end());
+						if (response[i] == "")
+						{
+							close(sd);
+							accepted[i] = -1;
+						}
+					}
 				}
     	    }
 			catch (std::exception &e) {
 				std::cout << e.what() << std::endl;
 				::close(sd);
 				accepted[i] = -1;
+				response[i].clear();
 			}
     	}
 	
