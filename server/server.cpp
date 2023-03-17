@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/16 16:22:58 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 13:00:29 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,13 @@ void server::stock_address_port(pars pars)
 int server::select_socket(fd_set read_fd , int max)
 {
 	int server_select;
-    server_select = select(max + 1, &read_fd, NULL, NULL, NULL);
-    if (server_select < 0)
-    {
-        throw std::invalid_argument(strerror(errno));
-        return (1);
-    }
+	server_select = select(max + 1, &read_fd, NULL, NULL, NULL);
+		if (server_select < 0)
+		{
+    		throw std::invalid_argument(strerror(errno));
+			return (1);
+		}
+
     return (0);
 }
 
@@ -43,18 +44,20 @@ int server::socket_server_start(void)
 {
 	for (std::multimap<std::string, long>::iterator it = server_listen.begin(); it != server_listen.end(); ++it)
 	{
+		int server_socket;
+		struct sockaddr_in addr; 
 		if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			throw std::invalid_argument(strerror(errno));
 		int opt = 1;
 		if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
 			throw std::invalid_argument("Error address socket is already used");
 		fcntl(server_socket, F_SETFL, O_NONBLOCK);
-		bzero(&this->addr, sizeof(this->addr));
+		bzero(&addr, sizeof(addr));
 		addr.sin_family = AF_INET;
 		addr.sin_addr.s_addr = inet_addr(it->first.c_str());
 		addr.sin_port = htons(it->second);
 		memset(addr.sin_zero, 0, sizeof addr.sin_zero);
-		 int server_bind;
+		int server_bind;
 		if ((server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr))) < 0)
 		{
 			throw std::invalid_argument(strerror(errno));
@@ -68,7 +71,6 @@ int server::socket_server_start(void)
 		}
 		std::pair<int, sockaddr_in> pair = std::make_pair(server_socket, addr);
 		Server.push_back(pair);
-		server_socket = 0;
 	}
     return (0);
 }
@@ -79,12 +81,11 @@ int server::start_server(pars pars)
     fd_set read_fd;
     std::string response;
 	int accepted[FD_SETSIZE];
-	const char *hello = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello world\n";
+	// const char *hello = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello world\n";
     int i;
 
 	stock_address_port(pars);
-    if (socket_server_start())
-        return (1);
+    socket_server_start();
 	for(i = 0; i < FD_SETSIZE; i++)
          accepted[i] = -1;
 	while (1)
@@ -104,15 +105,17 @@ int server::start_server(pars pars)
 			if (sd > max)
 				max = sd;
 		}
-        select_socket(read_fd, max);
+        int server_select;
+		server_select = select(max + 1, &read_fd, NULL, NULL, NULL);
+		if (server_select < 0)
+    		throw std::invalid_argument(strerror(errno));
 		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
 		{
 			if (FD_ISSET(it->first, &read_fd))
 			{
-				if((server_accept = accept(it->first, NULL, NULL)) >= 0)
+				if((server_accept = accept(it->first, (struct sockaddr *)&it->second, (socklen_t*)&it->second)) >= 0)
 				{
-					int j;
-					for (j = 0; j < FD_SETSIZE; j++)
+					for (int j = 0; j < FD_SETSIZE; j++)
 					{
 						if (accepted[j] < 0)
 						{
@@ -130,6 +133,7 @@ int server::start_server(pars pars)
 				if (sd > 0 && FD_ISSET(sd, &read_fd))
 				{
 					server_recv = recv(sd, buffer, BUFFER, 0);
+					// std::cout << buffer << std::endl;
 					if (server_recv == 0)
 					{
 						accepted[i] = -1;
@@ -141,21 +145,28 @@ int server::start_server(pars pars)
 					else if (server_recv > 0)
 					{
 						std::string tmp = buffer;
-						Request o(tmp, pars);
-						Response res(o);
-						if (o.getPath() == "/favicon.ico") {
-							send(sd, hello, strlen(hello), 0);
-							std::cout << "hello" << std::endl;
+						Request req(tmp, pars);
+						Response res(req);
+						if (res.getStatus() != OK)
+							response = res.sendErrorPage(res.getStatus());
+						// else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)
+						// 	response = res.uploadFile();
+						// else if (req.GetMethod() == "DELETE")
+						// 	response = res.deleteFile(req.getPath());
+						else if (!pathIsFile(req.getPath())) {
+							// if (req.GetLocation().GetCGI().GetFilePath().compare("") != 0)
+							// 		response = res.cgi(req);
+							// else
+							response = res.sendDir(req.getPath().c_str(), req.getHost());
 						}
-						else {
-							response = res.sendDir(o.getPath().c_str(), o.getHost());
-							int send_res = send(sd, response.c_str(), response.size(), 0);
-							if (send_res < 0)
-								throw std::invalid_argument(strerror(errno));
-							else if (send_res == 0)
-								continue ;						
-						}
+						else
+							response = res.sendFile(req.getPath());
 					}
+					int valsent = send(sd, response.c_str(), response.size(), 0);
+					if (valsent == 0)
+						continue;
+					else if (valsent < 0)
+						throw std::runtime_error("couldn't send the response");
 				}
     	    }
 			catch (std::exception &e) {

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/16 15:55:26 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 13:02:21 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ void Request::RequestParsing() {
 				if (i != req.size() - 1)
 					body.append("\r\n\r\n");
 			}
-			// if ((body.size() > _Server->max_client_body_size * 1000000)){
-			// 	_Status = PayloadTooLarge;
-			// 	return ;
-			// }
+			if ((body.size() > (size_t)_Server->max_client_body_size * 1000000)){
+				_Status = PayloadTooLarge;
+				return ;
+			}
 			if (_Headers["Transfer-Encoding"] == "chunked") {
 				if (_Headers.find("Content-Length") != _Headers.end()) {
 					_Status = BadRequest;

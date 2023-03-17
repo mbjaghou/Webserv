@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:18:29 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/13 19:51:01 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 13:04:55 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 location::location()
 {
 	root = "";
-	max_client_body_size = 0;
 	autoindex = "";
 	return_page = std::make_pair(0, "");
 }

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:03 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/14 12:01:19 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/16 20:16:44 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,5 @@ public:
 	const std::string &GetMethod() const;
 	const std::string &GetQuery() const;
 	const std::vector<std::string> &getBody() const;
+	
 };

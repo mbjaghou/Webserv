@@ -6,14 +6,14 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/16 15:35:49 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 11:10:47 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#define BUFFER 50000
+#define BUFFER 500000
 
 #include <iostream>
 #include <sys/socket.h>
@@ -32,8 +32,6 @@ class server
 {
     private:
         //attrbuite
-        struct sockaddr_in addr;
-        int server_socket;
         int server_accept;
         ssize_t server_recv;
         char buffer[BUFFER];

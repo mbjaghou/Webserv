@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/02/16 19:27:52 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 12:21:15 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,16 +215,18 @@ std::string Response::sendDir(const char *path, const std::string &host) {
 	std::string dirName(path);
 	struct dirent *dirEntry;
     DIR *dir = opendir(path);
-	headers << "HTTP/1.1 " << _Status << " " << ReasonPhrase(_Status) << "\r\n"
-		<< "Date: " << _Headers["Date"] << "\r\n"
-		<< "Connection: " << _Headers["Connection"] << "\r\n"
-		<< "\r\n";
     std::string page = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n<title>" + dirName + "</title>\r\n\
 	</head>\r\n<body>\r\n<h1>Webserv</h1>\r\n<p>\r\n";
     while ((dirEntry = readdir(dir)) != NULL)
 		page += getLink(std::string(dirEntry->d_name), dirName, host);
     page += "</p>\r\n</body>\r\n</html>\r\n";
 	closedir(dir);
+	headers << "HTTP/1.1 " << _Status << " " << ReasonPhrase(_Status) << "\r\n"
+		<< "Date: " << _Headers["Date"] << "\r\n"
+		<< "Content-Type: " << "text/html\r\n"
+		<< "Content-Length: " << page.size() << "\r\n"
+		<< "Connection: " << _Headers["Connection"] << "\r\n"
+		<< "\r\n";
 	return (headers.str() + page);
 }
 
