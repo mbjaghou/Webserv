@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/15 15:17:35 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/18 13:25:03 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,6 +220,22 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 			}
 			else
 				throw std::runtime_error("Error in error_page location");
+		}
+		else if (tmp[0] == "cgi_path")
+		{
+			if (tmp.size() != 2)
+				throw std::runtime_error("Error in cgi_path location");
+			else
+				loc.cgi_path = tmp[1];
+			
+		}
+		else if (tmp[0] == "cgi_extension")
+		{
+			if (tmp.size() != 2)
+				throw std::runtime_error("Error in cgi_path location");
+			else
+				loc.cgi_extension = tmp[1];
+			
 		}
 		else
 			throw std::runtime_error("Error: bad location");

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/17 14:21:04 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/17 18:28:39 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,12 @@ int server::socket_server_start(void)
 		struct sockaddr_in addr; 
 		if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			throw std::invalid_argument(strerror(errno));
+		// test
 		int opt = 1;
 		if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
 			throw std::invalid_argument("Error address socket is already used");
 		fcntl(server_socket, F_SETFL, O_NONBLOCK);
+		// test
 		bzero(&addr, sizeof(addr));
 		addr.sin_family = AF_INET;
 		addr.sin_addr.s_addr = inet_addr(it->first.c_str());
@@ -110,8 +112,7 @@ int server::start_server(pars pars)
 			if (sd > max)
 				max = sd;
 		}
-        int server_select;
-		server_select = select(max + 1, &read_fd, &write_fd, NULL, NULL);
+		int server_select = select(max + 1, &read_fd, &write_fd, NULL, NULL);
 		if (server_select < 0)
     		throw std::invalid_argument(strerror(errno));
 		for (std::vector<std::pair<int, sockaddr_in> >::iterator it = Server.begin(); it != Server.end(); ++it)
@@ -120,6 +121,7 @@ int server::start_server(pars pars)
 			{
 				if((server_accept = accept(it->first, (struct sockaddr *)&it->second, (socklen_t*)&it->second)) >= 0)
 				{
+					
 					for (int j = 0; j < FD_SETSIZE; j++)
 					{
 						if (accepted[j] < 0)
@@ -138,7 +140,6 @@ int server::start_server(pars pars)
 				if (sd > 0 && FD_ISSET(sd, &read_fd))
 				{
 					server_recv = recv(sd, buffer, BUFFER, 0);
-					// std::cout << buffer << std::endl;
 					if (server_recv == 0)
 					{
 						accepted[i] = -1;
@@ -196,6 +197,5 @@ int server::start_server(pars pars)
 				response[i].clear();
 			}
     	}
-	
 	}
 }
