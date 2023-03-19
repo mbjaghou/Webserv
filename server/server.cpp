@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/17 18:28:39 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/19 18:25:36 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,6 @@ int server::start_server(pars pars)
 	fd_set write_fd;
     std::vector<std::string> response(FD_SETSIZE);
 	int accepted[FD_SETSIZE];
-	// const char *hello = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\nHello world\n";
     int i;
 
 	stock_address_port(pars);
@@ -121,7 +120,8 @@ int server::start_server(pars pars)
 			{
 				if((server_accept = accept(it->first, (struct sockaddr *)&it->second, (socklen_t*)&it->second)) >= 0)
 				{
-					
+					int opt = 1;
+					setsockopt(server_accept, SOL_SOCKET, SO_NOSIGPIPE, &opt, sizeof(opt));	
 					for (int j = 0; j < FD_SETSIZE; j++)
 					{
 						if (accepted[j] < 0)
@@ -140,6 +140,7 @@ int server::start_server(pars pars)
 				if (sd > 0 && FD_ISSET(sd, &read_fd))
 				{
 					server_recv = recv(sd, buffer, BUFFER, 0);
+					// std::cout << buffer << std::endl;
 					if (server_recv == 0)
 					{
 						accepted[i] = -1;
@@ -156,10 +157,10 @@ int server::start_server(pars pars)
 						Response res(req);
 						if (res.getStatus() != OK)
 							response[i] = res.sendErrorPage(res.getStatus());
-						// else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)
-						// 	response[i] = res.uploadFile();
-						// else if (req.GetMethod() == "DELETE")
-						// 	response[i] = res.deleteFile(req.getPath());
+						else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)
+							response[i] = res.uploadFile();
+						else if (req.GetMethod() == "DELETE")
+							response[i] = res.deleteFile(req.getPath());
 						else if (!pathIsFile(req.getPath())) {
 							// if (req.GetLocation().GetCGI().GetFilePath().compare("") != 0)
 							// 		response[i] = res.cgi(req);

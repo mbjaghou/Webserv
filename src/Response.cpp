@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/17 14:10:38 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/19 19:23:25 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ std::string Response::sendErrorPage(int status) {
 	ss << status;
 	ss >> strStatus;
 
-	if (_ErrorPage[_Status] != "" && pathIsFile(_ErrorPage[_Status]) == 1)
+	if (_ErrorPage[_Status] != "" && pathIsFile(_ErrorPage[_Status]) == 1) 
 		return sendFile(_ErrorPage[_Status]);
 	else {
 		std::string error = "<html>\r\n<head><title>Error</title></head>\r\n<body>\r\n<center><h1>";

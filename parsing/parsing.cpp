@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/18 13:25:03 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/19 19:27:18 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,7 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 				loc.return_page = std::make_pair(status, tmp[2]);
 			}
 			else
-				throw std::runtime_error("Error in error_page");
+				throw std::runtime_error("Error in return");
 		}
 		else if (tmp[0] == "autoindex")
 		{
@@ -202,8 +202,8 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 		}
 		else if (tmp[0] == "max_client_body_size")
 		{
-			if (loc.max_client_body_size != 0)
-				throw std::runtime_error("Error max_client_body_size is duplicate location");
+			// if (loc.max_client_body_size < 0)
+			// 	throw std::runtime_error("Error max_client_body_size is duplicate location");
 			if (tmp.size() == 2)
 				loc.max_client_body_size = atol(tmp[1].c_str());
 			else
@@ -265,7 +265,6 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 {
 	std::vector<std::string> tmp;
 	pars_server server;
-	
 	
 	tmp = ft_split(conf[0], " \t");
 	if (tmp[1] != "{")
@@ -352,12 +351,12 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 		}
 		else if (tmp[0] == "\tmax_client_body_size")
 		{
-			if (server.max_client_body_size != 0)
-				throw std::runtime_error("Error max_client_body_size is duplicate");
 			if (tmp.size() == 2)
 				server.max_client_body_size = atol(tmp[1].c_str());
 			else
 				throw std::runtime_error("Error in max_client_body_size");
+			// if (server.max_client_body_size == -1)
+			// 	throw std::runtime_error("Error max_client_body_size is duplicate");
 		}
 		else if (tmp[0] == "\tallowed_methods")
 		{
