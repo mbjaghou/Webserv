@@ -6,14 +6,14 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/20 13:44:46 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 18:56:42 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#define BUFFER 1024
+#define BUFFER 65000
 
 #include <iostream>
 #include <sys/socket.h>
@@ -33,7 +33,7 @@ class server
     private:
         //attrbuite
         int server_accept;
-        size_t server_recv;
+        int server_recv;
         char buffer[BUFFER];
         
     public:
@@ -45,5 +45,6 @@ class server
         int select_socket(fd_set read_fd, int max);
 		void stock_address_port(pars pars);
         int start_server(pars pars);
+		std::string recv_data(int socket, int &check);
 };
 #endif

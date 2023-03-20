@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/20 10:58:51 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 18:28:03 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,7 +254,7 @@ location pars::check_content_of_location(location loc, pars_server server)
 		loc.index = server.index;
 	if (loc.allowed_methods.size() == 0 && server.allowed_methods.size() != 0)
 		loc.allowed_methods = server.allowed_methods;
-	if (loc.max_client_body_size == 0 && server.max_client_body_size != 0)
+	if (loc.max_client_body_size == 1 && server.max_client_body_size != 1)
 		loc.max_client_body_size = server.max_client_body_size;
 	if (loc.error_page.size() == 0 && server.error_page.size() != 0)
 		loc.error_page = server.error_page;

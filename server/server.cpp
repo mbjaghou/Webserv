@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/20 14:44:17 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 19:21:26 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,6 @@ void server::stock_address_port(pars pars)
 	}
 }
 
-int server::select_socket(fd_set read_fd , int max)
-{
-	int server_select;
-	server_select = select(max + 1, &read_fd, NULL, NULL, NULL);
-		if (server_select < 0)
-		{
-    		throw std::invalid_argument(strerror(errno));
-			return (1);
-		}
-
-    return (0);
-}
 
 int server::socket_server_start(void)
 {
@@ -54,7 +42,7 @@ int server::socket_server_start(void)
 		fcntl(server_socket, F_SETFL, O_NONBLOCK);
 		bzero(&addr, sizeof(addr));
 		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		addr.sin_addr.s_addr = inet_addr(it->first.c_str());
 		addr.sin_port = htons(it->second);
 		memset(addr.sin_zero, 0, sizeof addr.sin_zero);
 		int server_bind;
@@ -75,6 +63,44 @@ int server::socket_server_start(void)
     return (0);
 }
 
+std::string server::recv_data(int socket, int & check)
+{
+	static std::vector<std::string> responses(FD_SETSIZE);
+	size_t					nbytes = 0;
+    ioctl(socket, FIONREAD, &nbytes);
+	std::vector<char>		buffer2(nbytes);
+	server_recv = recv(socket, &buffer2[0], nbytes, 0);
+	if (server_recv <= 0)
+		return ("");
+	std::string data;
+	data.append(buffer2.begin(), buffer2.end());
+	size_t pos = data.find("Content-Length:");
+	size_t pos_end = data.find("\r\n", pos);
+	size_t body_pos = data.find("\r\n\r\n") + 4;
+	std::string real_body_length = data.substr(pos + 16, pos_end - pos - 16);
+	int content_length = data.substr(body_pos).size();
+	if (pos == std::string::npos || pos_end == std::string::npos || body_pos == std::string::npos)
+		return (data);
+	if (content_length == stoi(real_body_length))
+		return data;
+	if (content_length < stoi(real_body_length)) {
+		for (int i = 0; i < FD_SETSIZE; ++i) {
+			if (i == socket) {
+				responses[i].append(data);
+				if (responses[i].size() == (size_t)stoi(real_body_length)) {
+					std::string tmp = responses[i];
+					responses[i].clear();
+					return tmp;
+				}
+				else {
+					check = 1;
+					return "";
+				}
+			}
+		}
+	}
+	return data;
+}
 
 int server::start_server(pars pars)
 {
@@ -129,15 +155,21 @@ int server::start_server(pars pars)
 						}
 					}
 				}
+				break;
 			}
 		}
     	for (i = 0; i < FD_SETSIZE; ++i)
     	{
 			int sd = accepted[i];
+			int check = 0;
 			try {
 				if (sd > 0 && FD_ISSET(sd, &read_fd))
 				{
-					server_recv = recv(sd, buffer, BUFFER, 0);
+					std::string tmp = recv_data(sd, check);
+					if (check == 1)
+						continue ;
+					// std::cout << tmp ;
+					// server_recv = recv(sd, buffer, BUFFER, 0);
 					if (server_recv == 0)
 					{
 						accepted[i] = -1;
@@ -149,7 +181,6 @@ int server::start_server(pars pars)
 						throw std::invalid_argument(strerror(errno));
 					else if (server_recv > 0)
 					{
-						std::string tmp = buffer;
 						Request req(tmp, pars);
 						Response res(req);
 						if (res.getStatus() != OK)

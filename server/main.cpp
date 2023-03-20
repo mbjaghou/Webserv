@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 15:32:23 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/19 19:11:23 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 15:44:40 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,6 @@ int main(int ac, char **av)
 		pars   pars;
 		
 		pars.parsing(ac, av);
-		
-		for (std::map<int, std::string>::iterator it = pars.parssing[0].error_page.begin(); it != pars.parssing[0].error_page.end(); it++)
-		{
-			std::cout << it->first << " " << it->second << std::endl;
-		}
         server serv;
         serv.start_server(pars);
     }

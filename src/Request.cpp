@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/19 19:26:24 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 18:26:02 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void Request::RequestParsing() {
 				if (i != req.size() - 1)
 					body.append("\r\n\r\n");
 			}
-			if ((body.size() > (size_t)_Server->max_client_body_size * 1000000)){
+			if ((body.size() > _Server->max_client_body_size * 1000000)){
 				_Status = PayloadTooLarge;
 				return ;
 			}
