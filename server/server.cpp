@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/19 18:25:36 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 14:44:17 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,15 +48,13 @@ int server::socket_server_start(void)
 		struct sockaddr_in addr; 
 		if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			throw std::invalid_argument(strerror(errno));
-		// test
 		int opt = 1;
 		if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
 			throw std::invalid_argument("Error address socket is already used");
 		fcntl(server_socket, F_SETFL, O_NONBLOCK);
-		// test
 		bzero(&addr, sizeof(addr));
 		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = inet_addr(it->first.c_str());
+		addr.sin_addr.s_addr = htonl(INADDR_ANY);
 		addr.sin_port = htons(it->second);
 		memset(addr.sin_zero, 0, sizeof addr.sin_zero);
 		int server_bind;
@@ -140,7 +138,6 @@ int server::start_server(pars pars)
 				if (sd > 0 && FD_ISSET(sd, &read_fd))
 				{
 					server_recv = recv(sd, buffer, BUFFER, 0);
-					// std::cout << buffer << std::endl;
 					if (server_recv == 0)
 					{
 						accepted[i] = -1;
