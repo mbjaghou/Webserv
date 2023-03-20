@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/19 19:27:18 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 10:58:51 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,12 +202,12 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 		}
 		else if (tmp[0] == "max_client_body_size")
 		{
-			// if (loc.max_client_body_size < 0)
-			// 	throw std::runtime_error("Error max_client_body_size is duplicate location");
+			if (atol(tmp[1].c_str()) < 0)
+				throw std::runtime_error("Error in max_client_body_size location");
 			if (tmp.size() == 2)
 				loc.max_client_body_size = atol(tmp[1].c_str());
 			else
-				throw std::runtime_error("Error in max_client_body_size");
+				throw std::runtime_error("Error in max_client_body_size location");
 		}
 		else if (tmp[0] == "error_page")
 		{
@@ -351,12 +351,12 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 		}
 		else if (tmp[0] == "\tmax_client_body_size")
 		{
+			if (atol(tmp[1].c_str()) < 0)
+				throw std::runtime_error("Error in max_client_body_size");
 			if (tmp.size() == 2)
 				server.max_client_body_size = atol(tmp[1].c_str());
 			else
 				throw std::runtime_error("Error in max_client_body_size");
-			// if (server.max_client_body_size == -1)
-			// 	throw std::runtime_error("Error max_client_body_size is duplicate");
 		}
 		else if (tmp[0] == "\tallowed_methods")
 		{

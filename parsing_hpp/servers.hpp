@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:15 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/14 14:47:21 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/20 10:46:38 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class pars_server
         std::vector<std::string> 					server_name;
         std::vector<std::string> 					index;
         std::map<int, std::string> 					error_page;
-		long 										max_client_body_size;
+		int 										max_client_body_size;
 		std::vector<std::string> 					allowed_methods;
 		std::vector<location> 	 					location;
 		bool 										autoindex;
