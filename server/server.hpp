@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/20 18:56:42 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/21 14:04:09 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@ class server
         //attrbuite
         int server_accept;
         int server_recv;
-        char buffer[BUFFER];
-        
     public:
         //membre fuction
         std::vector<std::pair<int, sockaddr_in> > Server;
