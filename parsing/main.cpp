@@ -40,6 +40,9 @@ int main(int ac, char **av)
 					std::cout << "location allowed_methods: " << *it << std::endl;
 				std::cout << "location autoindex: " << pars.parssing[i].location[j].autoindex << std::endl;
 				std::cout << "location max_client_body_size: " << pars.parssing[i].location[j].max_client_body_size << std::endl;
+				std::cout << "location cgi_extension : " << pars.parssing[i].location[j].cgi_extension << std::endl;
+				std::cout << "location cgi_path : " << pars.parssing[i].location[j].cgi_path << std::endl;
+				std::cout << "location cgi_script : " << pars.parssing[i].location[j].cgi_script << std::endl;
 			}
 			
 		}

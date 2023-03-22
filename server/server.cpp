@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/22 16:27:12 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/22 17:03:51 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,9 +83,9 @@ std::string    server::recv_data(int sockfd, int& check)
 			if (i->first == sockfd)
 			{
 				i->second.append(buffer.begin(), buffer.end());
-				size_t pos = i->second.find("\r\n\r\n");
+				size_t pos_end = i->second.find("\r\n\r\n");
 				size_t contLenPos = i->second.find("Content-Length: ");
-				size_t bodyLen = i->second.substr(pos + 4).size();
+				size_t bodyLen = i->second.substr(pos_end + 4).size();
 				int contLen = atoi(i->second.substr(contLenPos + 16, i->second.find("\r\n", contLenPos)).c_str());
 				if (contLen > (int)bodyLen)
 					return ("");
@@ -100,12 +100,12 @@ std::string    server::recv_data(int sockfd, int& check)
 			
 	}
 	data.append(buffer.begin(), buffer.end());
-	size_t contLenPos = data.find("Content-Length: ");
-	size_t pos = data.find("\r\n\r\n");
-	if (pos == std::string::npos || contLenPos == std::string::npos)
+	size_t pos = data.find("Content-Length: ");
+	size_t pos_end = data.find("\r\n\r\n");
+	if (pos_end == std::string::npos || pos == std::string::npos)
 		return (data);
-	size_t bodyLen = data.substr(pos + 4).size();
-	int contLen = atoi(data.substr(contLenPos + 16, data.find("\r\n", contLenPos)).c_str());
+	size_t bodyLen = data.substr(pos_end + 4).size();
+	int contLen = atoi(data.substr(pos + 16, data.find("\r\n", pos)).c_str());
 	if (contLen > (int)bodyLen)
 	{
 		std::pair<int, std::string> stock;
@@ -190,7 +190,6 @@ int server::start_server(pars pars)
 						response[i].clear();
 						continue;
 					}
-					std::cout << tmp;
 					Request req(tmp, pars);
 					Response res(req);
 					if (res.getStatus() != OK)

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/20 18:28:03 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/22 17:18:01 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,18 +223,26 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 		}
 		else if (tmp[0] == "cgi_path")
 		{
+			if (loc.cgi_path.size() != 0)
+				throw std::runtime_error("Error cgi_path is duplicate location");
 			if (tmp.size() != 2)
 				throw std::runtime_error("Error in cgi_path location");
 			else
 				loc.cgi_path = tmp[1];
 			
 		}
-		else if (tmp[0] == "cgi_extension")
+		else if (tmp[0] == "cgi_script")
 		{
+			if (loc.cgi_script.size() != 0)
+				throw std::runtime_error("Error cgi_script is duplicate location");
 			if (tmp.size() != 2)
-				throw std::runtime_error("Error in cgi_path location");
+				throw std::runtime_error("Error in cgi_script location");
 			else
-				loc.cgi_extension = tmp[1];
+			{
+				size_t pos = tmp[1].find('.');
+				loc.cgi_extension = tmp[1].substr(pos);
+				loc.cgi_script = tmp[1];
+			}
 			
 		}
 		else
@@ -258,6 +266,8 @@ location pars::check_content_of_location(location loc, pars_server server)
 		loc.max_client_body_size = server.max_client_body_size;
 	if (loc.error_page.size() == 0 && server.error_page.size() != 0)
 		loc.error_page = server.error_page;
+	if ((loc.cgi_path.size() == 0 && loc.cgi_script.size() != 0) || (loc.cgi_path.size() != 0  &&loc.cgi_script.size() == 0))
+		throw std::runtime_error("Error must add cgi_path or cgi_script");
 	return (loc);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:16:39 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/18 13:41:46 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/22 17:06:48 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class location
 		long 							max_client_body_size;
 		std::map<int, std::string> 		error_page;
 		std::string 					cgi_path;
+		std::string 					cgi_script;
 		std::string 					cgi_extension;
 
 
