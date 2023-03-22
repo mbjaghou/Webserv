@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/21 14:16:50 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/22 16:27:12 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,66 +63,58 @@ int server::socket_server_start(void)
     return (0);
 }
 
-std::string server::recv_data(int socket, int & check)
+std::string    server::recv_data(int sockfd, int& check)
 {
-	static std::vector<std::string> responses(FD_SETSIZE);
-	size_t					nbytes = 0;
-    ioctl(socket, FIONREAD, &nbytes);
-	std::vector<char>		buffer2(nbytes);
-	server_recv = recv(socket, &buffer2[0], nbytes, 0);
-	if (server_recv <= 0)
+    static std::vector<std::pair<int,std::string> > responses;
+    size_t					nbytes = 0;
+    ioctl(sockfd, FIONREAD, &nbytes);
+    std::vector<char>		buffer(nbytes);
+    std::string				data;
+
+	server_recv = recv(sockfd, &buffer[0], nbytes, 0);
+    if (server_recv == 0)
+        check = -1;
+	if (server_recv < 0)
+		throw std::invalid_argument(strerror(errno));
+    else if (server_recv > 0)
+    {
+		for (std::vector<std::pair<int,std::string> >::iterator i = responses.begin(); i < responses.end(); i++)
+		{
+			if (i->first == sockfd)
+			{
+				i->second.append(buffer.begin(), buffer.end());
+				size_t pos = i->second.find("\r\n\r\n");
+				size_t contLenPos = i->second.find("Content-Length: ");
+				size_t bodyLen = i->second.substr(pos + 4).size();
+				int contLen = atoi(i->second.substr(contLenPos + 16, i->second.find("\r\n", contLenPos)).c_str());
+				if (contLen > (int)bodyLen)
+					return ("");
+				else
+				{
+					data = i->second;
+					responses.erase(i);
+					return (data);
+				}
+			}
+		}
+			
+	}
+	data.append(buffer.begin(), buffer.end());
+	size_t contLenPos = data.find("Content-Length: ");
+	size_t pos = data.find("\r\n\r\n");
+	if (pos == std::string::npos || contLenPos == std::string::npos)
+		return (data);
+	size_t bodyLen = data.substr(pos + 4).size();
+	int contLen = atoi(data.substr(contLenPos + 16, data.find("\r\n", contLenPos)).c_str());
+	if (contLen > (int)bodyLen)
+	{
+		std::pair<int, std::string> stock;
+		stock.first = sockfd;
+		stock.second = data;
+		responses.push_back(stock);
 		return ("");
-	std::string data;
-	data.append(buffer2.begin(), buffer2.end());
-	size_t pos;
-	size_t pos_end;
-	size_t body_pos;
-	std::string real_body_length;
-	int content_length;
-	if (check == 0) {
-		pos = data.find("Content-Length:");
-		pos_end = data.find("\r\n", pos);
-		body_pos = data.find("\r\n\r\n") + 4;
-		real_body_length = data.substr(pos + 16, pos_end - pos - 16);
-		content_length = data.substr(body_pos).size();
-		if (pos == std::string::npos || pos_end == std::string::npos || body_pos == std::string::npos)
-			return (data);
-		if (content_length == stoi(real_body_length))
-			return data;
-		if (content_length < stoi(real_body_length)) {
-			for (int i = 0; i < FD_SETSIZE; ++i) {
-				if (i == socket) {
-					responses[i].append(data);
-					if (responses[i].size() == (size_t)stoi(real_body_length)) {
-						std::string tmp = responses[i];
-						responses[i].clear();
-						return tmp;
-					}
-					else {
-						check = 1;
-						return "";
-					}
-				}
-			}
-		}
 	}
-	else {
-		for (int i = 0; i < FD_SETSIZE; ++i) {
-			if (i == socket) {
-				responses[i].append(data);
-				if (responses[i].size() == data.size()) {
-					std::string tmp = responses[i];
-					responses[i].clear();
-					return tmp;
-				}
-				else {
-					check = 1;
-					return "";
-				}
-			}
-		}
-	}
-	return data;
+    return (data);
 }
 
 
@@ -189,37 +181,32 @@ int server::start_server(pars pars)
 				if (sd > 0 && FD_ISSET(sd, &read_fd))
 				{
 					std::string tmp = recv_data(sd, check);
-					if (check == 1)
-						continue ;
-					 std::cout << tmp ;
-					if (server_recv == 0)
+					if (tmp == "")
+						continue;
+					if (check == -1)
 					{
 						accepted[i] = -1;
 						::close(sd);
 						response[i].clear();
 						continue;
 					}
-					else if (server_recv < 0)
-						throw std::invalid_argument(strerror(errno));
-					else if (server_recv > 0)
-					{
-						Request req(tmp, pars);
-						Response res(req);
-						if (res.getStatus() != OK)
-							response[i] = res.sendErrorPage(res.getStatus());
-						else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
-							response[i] = res.uploadFile();
-						else if (req.GetMethod() == "DELETE")
-							response[i] = res.deleteFile(req.getPath());
-						else if (!pathIsFile(req.getPath())) {
-							// if (req.GetLocation().GetCGI().GetFilePath().compare("") != 0)
-							// 		response[i] = res.cgi(req);
-							// else
-							response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
-						}
-						else
-							response[i] = res.sendFile(req.getPath());
+					std::cout << tmp;
+					Request req(tmp, pars);
+					Response res(req);
+					if (res.getStatus() != OK)
+						response[i] = res.sendErrorPage(res.getStatus());
+					else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
+						response[i] = res.uploadFile();
+					else if (req.GetMethod() == "DELETE")
+						response[i] = res.deleteFile(req.getPath());
+					else if (!pathIsFile(req.getPath())) {
+						// if (req.GetLocation().GetCGI().GetFilePath().compare("") != 0)
+						// 		response[i] = res.cgi(req);
+						// else
+						response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
 					}
+					else
+						response[i] = res.sendFile(req.getPath());
 				}
 				if (sd > 0 && FD_ISSET(sd, &write_fd))
 				{

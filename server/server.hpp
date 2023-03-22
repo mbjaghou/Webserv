@@ -6,14 +6,14 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/21 14:04:09 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/22 15:53:33 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#define BUFFER 65000
+#define BUFFER 1048576
 
 #include <iostream>
 #include <sys/socket.h>
