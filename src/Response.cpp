@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/20 17:08:50 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/22 17:58:02 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,29 +108,10 @@ std::string Response::uploadFile() {
 	return (headers.str() + success);
 }
 
-// std::string Response::cgi(Request const &obj){
-// 	std::string tmp = obj.getHost();
-// 	size_t pos = tmp.find_first_of(":");
-// 	short port;
-// 	std::string para;
-// 	if (pos == std::string::npos)
-// 		port = 80;
-// 	else{
-// 		pos++;
-// 		port = stoi(tmp.substr(pos));
-// 	}
-// 	std::ostringstream headers;
-// 	try {
-// 		CGI _cgi(obj, port, _Method);
-// 		parseCgiOutput(_cgi.GetOutput(), headers, _cgi.GetExtention());
-// 	}
-// 	catch (std::exception const &e) {
-// 		std::cerr << e.what() << "\n";
-// 		_Status = 500;
-// 		return sendErrorPage(500);
-// 	}
-// 	return headers.str();
-// }
+std::string Response::cgi(Request const &obj){
+	(void )obj;
+	return "OK";
+}
 
 std::string Response::sendHeaders(const std::string &filename) {
 	std::ifstream file(filename);

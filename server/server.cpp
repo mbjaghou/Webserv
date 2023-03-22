@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/22 17:03:51 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/22 17:56:45 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,10 +199,10 @@ int server::start_server(pars pars)
 					else if (req.GetMethod() == "DELETE")
 						response[i] = res.deleteFile(req.getPath());
 					else if (!pathIsFile(req.getPath())) {
-						// if (req.GetLocation().GetCGI().GetFilePath().compare("") != 0)
-						// 		response[i] = res.cgi(req);
-						// else
-						response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
+						if (req.getLocation()->cgi_path.compare("") != 0)
+								response[i] = res.cgi(req);
+						else
+							response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
 					}
 					else
 						response[i] = res.sendFile(req.getPath());
