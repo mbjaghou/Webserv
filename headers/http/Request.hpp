@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:03 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/22 17:54:53 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/22 18:02:16 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,5 +63,8 @@ public:
 	const std::string &GetQuery() const;
 	const std::vector<std::string> &getBody() const;
 	const location *getLocation() const;
+	const std::string getPort() const;
+	const std::string getIp() const;
+	const pars_server* getServer() const;
 	
 };

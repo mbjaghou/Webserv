@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/22 17:58:02 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/22 18:55:08 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,78 @@ std::string Response::uploadFile() {
 
 	return (headers.str() + success);
 }
+std::string Response::getEnv(Request const &obj)
+{
+	std::string env;
+    env.append("SERVER_SOFTWARE=webserv\n");
+    env.append("SERVER_NAME=localhost\n");// mn b3d
+    env.append("GATEWAY_INTERFACE=CGI/1.1\n");
+    env.append("SERVER_PROTOCOL=HTTP/1.1\n");
+    env.append("SERVER_PORT=");env.append(obj.getPort());env.append("\n");
+    env.append("REQUEST_METHOD=");env.append(obj.GetMethod());env.append("\n");
+	env.append("QUERY_STRING=");env.append(obj.GetQuery());env.append("\n");
+	env.append("PATH_INFO=");env.append(obj.getLocation()->cgi_path);env.append("\n");
+	env.append("SCRIPT_FILENAME=");env.append(obj.getLocation()->cgi_script);env.append("\n");
+    env.append("DOCUMENT_ROOT=");env.append(obj.getLocation()->root);env.append("\n");
+	env.append("REDIRECT_STATUS=");env += obj.getLocation()->return_page.first;env.append("\n");
+	env.append("name=toto\n");
+	env.append("email=tata\n");
+	env.append("");
+    return env;
+}
 
 std::string Response::cgi(Request const &obj){
-	(void )obj;
-	return "OK";
+	std::vector<std::string> envp = ft_split(getEnv(obj), "\n");
+	char **env = new char*[envp.size() + 1];
+	for (size_t i = 0; i < envp.size(); ++i) {
+		env[i] = new char[envp[i].size() + 1];
+		strcpy(env[i], envp[i].c_str());
+	}
+	env[envp.size()] = NULL;
+	std::string cgi_path = obj.getLocation()->cgi_path;
+	std::string cgi_script = obj.getLocation()->cgi_script;
+	if(access(cgi_script.c_str(), F_OK) == -1 || access(cgi_path.c_str(), X_OK) == -1)
+		return sendErrorPage(500);
+	char* argv[] = {const_cast<char*>(cgi_path.c_str()), const_cast<char *>(cgi_script.c_str()), NULL};
+	int pipefd[2];
+	std::ostringstream	headers;
+	if(pipe(pipefd) == -1)
+		return sendErrorPage(500);
+	pid_t pid = fork();
+	if (pid == -1)
+		return sendErrorPage(500);
+	else if(pid == 0) // child process
+	{
+		dup2(pipefd[1], 1);
+		close(pipefd[0]);
+		execve(argv[0], argv, env);
+		return sendErrorPage(500);
+	}
+	else // parent process
+	{
+		close(pipefd[1]);
+		std::string cgi_output;
+		char buffer[1024];
+		ssize_t bytes_read;
+		while ((bytes_read = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
+			cgi_output.append(buffer, bytes_read);
+		}
+		close(pipefd[0]);
+		int status;
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+			headers << "HTTP/1.1 200 OK\r\n"
+			<< "Date: " << _Headers["Date"] << "\r\n"
+			<< "Content-Type: " << "text/html\r\n"
+			<< "Content-Length: " << cgi_output.size() << "\r\n"
+			<< "Connection: close\r\n\r\n";
+            return (headers.str() + cgi_output);
+		}
+		else
+			return sendErrorPage(500);
+        
+	}
+	return sendErrorPage(500);
 }
 
 std::string Response::sendHeaders(const std::string &filename) {

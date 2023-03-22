@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/22 17:56:03 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/22 18:03:08 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,4 +322,16 @@ const std::vector<std::string> &Request::getBody() const {
 const location *Request::getLocation() const
 {
 	return _Location;
+}
+const std::string Request::getPort() const {
+	return _Host.substr(_Host.find(":") + 1);
+}
+
+const std::string Request::getIp() const {
+	return _Host.substr(0, _Host.find(":"));
+}
+
+const pars_server* Request::getServer() const
+{
+	return _Server;
 }
