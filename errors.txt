@@ -1,29 +1,41 @@
-duplicated max_client_body_size
 
-duplicated error_page
+duplicated error_page // fixed
 
-duplicated autoindex
+duplicated autoindex // fixed
+
+allowed_methods GET TEG BLABla; // fixed
+
+duplicated max_client_body_size // fixed
+
+max_client_body_size dd; // fixed
+
+max_client_body_size 5.9; // fixed
+
+check extantion // fixed
+
+return 301.45 /Users/ylabtaim/Desktop/Webserv/Makefile; // fixed
+
+allowed_methods th GET; // fixed
+
+error_page 404.89 /Users/ylabtaim/Desktop/Webserv/error_pages/index.html; //fixed
+
+
 
 duplicated location
 
-max_client_body_size dd;
+listen 127.0.0.1:9090; // if 2 servers listens to the same host:port there must not be an error
 
-max_client_body_size 5.9;
+cgi_path
 
-allowed_methods GET TEG BLABla;
+uplode_path
 
-allowed_methods GET GET GET;
-
-return 301.45 /Users/ylabtaim/Desktop/Webserv/Makefile;
-
-error_page 404.89 /Users/ylabtaim/Desktop/Webserv/error_pages/index.html;
-
+fixed
 ======================================================================================
-this throws basic_string:
+this throws basic_string: 
 
 ```
 server {
-	listen 127.0.0.1:9090;
+	listen 127.0.0.1:9090; // if 2 servers listens to the same host:port there must not be an error
 	listen 127.0.0.1:8080;
 	index index.php index.html;
 	# max_client_body_size dd;

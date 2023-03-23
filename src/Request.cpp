@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/22 18:03:08 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:09:05 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,8 @@ void Request::ParseHeaders(std::vector<std::string> & headers) {
 		return ;
 	}
 	if (_Headers["Transfer-Encoding"] == "chunked" && _Headers.find("Content-Length") != _Headers.end())
+		_Status = BadRequest;
+	if (_Headers["Set-Cookie"].length() > 4096)
 		_Status = BadRequest;
 }
 

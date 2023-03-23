@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:16:39 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/22 17:06:48 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:10:17 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ class location
 		std::map<int, std::string> 		error_page;
 		std::string 					cgi_path;
 		std::string 					cgi_script;
-		std::string 					cgi_extension;
 
 
 		void set_uploade_path(std::string uploade_path);
