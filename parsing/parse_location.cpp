@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parse_location.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:18:29 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/20 12:46:10 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/23 14:19:05 by ylabtaim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../parsing_hpp/parse_location.hpp"
+#include "../headers/parsing_hpp/parse_location.hpp"
 
 location::location()
 {

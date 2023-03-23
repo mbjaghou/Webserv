@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/23 13:59:39 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/23 15:35:02 by ylabtaim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "../headers/http/server.hpp"
 
 server::server(){std::cout << "\033[32m" << "Welcome to my server" << "\033[0m" << std::endl;}
 
@@ -38,7 +38,7 @@ int server::socket_server_start(void)
 			throw std::invalid_argument(strerror(errno));
 		int opt = 1;
 		if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
-			throw std::invalid_argument("Error address socket is already used");
+			throw std::invalid_argument("address socket is already used");
 		fcntl(server_socket, F_SETFL, O_NONBLOCK);
 		bzero(&addr, sizeof(addr));
 		addr.sin_family = AF_INET;

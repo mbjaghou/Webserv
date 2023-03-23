@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/22 17:18:01 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/23 15:56:50 by ylabtaim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../parsing_hpp/parsing.hpp"
+#include "../headers/parsing_hpp/parsing.hpp"
 
 pars::~pars(){}
 pars::pars(){}
@@ -63,11 +63,9 @@ void pars::parsing_config(std::string line)
 	
 	size_t j = line.find_last_of(";{}");
 	if (j != line.size() - 1)
-		throw std::runtime_error("Error: find another char after ';' Or ';' is missing");
+		throw std::runtime_error("end of line must be either ';' or '}' or '{'");
     if (line[0] && line[0] != '\n')
-    {
          conf_file += line + "\n";
-    }
 }
 
 void pars::open_file_read(char **av)
@@ -84,7 +82,7 @@ void pars::open_file_read(char **av)
         file.close();
     }
     else
-        throw std::invalid_argument("bad Open File");
+        throw std::invalid_argument("Could not open file");
 }
 
 void pars::stock_data(void)
@@ -103,6 +101,8 @@ void pars::stock_data(void)
 			pars_server server = parsing_servers(config, &count);
 			parssing.push_back(server);
 		}
+		else
+			throw std::runtime_error("Server block must start with \"server\"");
 		count++;	
 	}
 }
@@ -110,7 +110,7 @@ void pars::stock_data(void)
 int pars::parssing_port(int port)
 {
 	if (port <= 0 || port > 65535)
-		throw std::invalid_argument("Error whit the port");
+		throw std::invalid_argument("invalid port");
 	return (port);
 }
 
@@ -120,7 +120,7 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 	location loc;
 
 	if (str[2] != "{")
-		throw std::runtime_error("Error must be add '{' or spase");
+		throw std::runtime_error("location's line must end with '{'");
 	loc.uploade_path = str[1];
 	(*count)++;
 	std::vector<std::string>::iterator it = conf.begin() + (*count);
@@ -136,19 +136,19 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 			if (tmp.size() == 2)
 			{
 				if (loc.root.size() != 0)
-					throw std::runtime_error("Error root is duplicate location");
+					throw std::runtime_error("root is duplicated in location " + str[1]);
 				else
 					loc.root = tmp[1];
 			}
 			else
-				throw std::runtime_error("Error in root location");
+				throw std::runtime_error("root in " + str[1] + " should take only one argument");
 		}
 		else if (tmp[0] == "index")
 		{
 			if (loc.index.size() != 0)
-				throw std::runtime_error("Error index is duplicate location");
+				throw std::runtime_error("index is duplicated in location" + str[1]);
 			if (tmp.size() == 1)
-				throw std::runtime_error("Error in index location");
+				throw std::runtime_error("the index directive in location " + str[1] + " needs arguments");
 			size_t i = 1;
 			while (i < tmp.size())
 			{
@@ -159,11 +159,11 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 		else if (tmp[0] == "allowed_methods")
 		{
 			if (tmp.size() > 4 || tmp.size() == 1)
-				throw std::runtime_error("Error in allowed_methods in location");
+				throw std::runtime_error("invalid number of arguments in allowed_methods in location " + str[1]);
 			else
 			{
 				if (loc.allowed_methods.size() != 0)
-					throw std::runtime_error("Error in allowed_methods is duplicate location");
+					throw std::runtime_error("allowed_methods is duplicated in location " + str[1]);
 				size_t i = 1;
 				while (i < tmp.size())
 				{
@@ -175,16 +175,14 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 		else if (tmp[0] == "return")
 		{
 			if (loc.return_page.first != 0 && loc.return_page.second.size() != 0)
-				throw std::runtime_error("Error return is duplicate location");
+				throw std::runtime_error("return is duplicated in location " + str[1]);
 			int status = atol(tmp[1].c_str());
 			if (status < 301 || status > 308)
-				throw std::runtime_error("Error in satatus code");
+				throw std::runtime_error("invalid status code of return directive in location " + str[1]);
 			if (tmp.size() == 3)
-			{
 				loc.return_page = std::make_pair(status, tmp[2]);
-			}
 			else
-				throw std::runtime_error("Error in return");
+				throw std::runtime_error("invalid number of arguments for return in location " + str[1]);
 		}
 		else if (tmp[0] == "autoindex")
 		{
@@ -195,58 +193,54 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 				else if (tmp[1] == "off")
 					loc.autoindex = false;
 				else
-					throw std::runtime_error("Error in autoindex you must be add 'on' or 'off' in location");
+					throw std::runtime_error("invalid argument for autoindex in location " + str[1]);
 			}
 			else
-				throw std::runtime_error("Error in autoindex in location");
+				throw std::runtime_error("invalid number of arguments for autoindex in location " + str[1]);
 		}
 		else if (tmp[0] == "max_client_body_size")
 		{
 			if (atol(tmp[1].c_str()) < 0)
-				throw std::runtime_error("Error in max_client_body_size location");
+				throw std::runtime_error("max_client_body_size is negative in location " + str[1]);
 			if (tmp.size() == 2)
 				loc.max_client_body_size = atol(tmp[1].c_str());
 			else
-				throw std::runtime_error("Error in max_client_body_size location");
+				throw std::runtime_error("invalid number of arguments for max_client_body_size in location " + str[1]);
 		}
 		else if (tmp[0] == "error_page")
 		{
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
-				throw std::runtime_error("Error in satatus code location");
+				throw std::runtime_error("invalid status code for error_page in location " + str[1]);
 			if (tmp.size() == 3)
-			{
 				loc.error_page.insert(std::make_pair(status, tmp[2]));
-			}
 			else
-				throw std::runtime_error("Error in error_page location");
+				throw std::runtime_error("invalid number of arguments for error_page in location " + str[1]);
 		}
 		else if (tmp[0] == "cgi_path")
 		{
 			if (loc.cgi_path.size() != 0)
-				throw std::runtime_error("Error cgi_path is duplicate location");
+				throw std::runtime_error("cgi_path is duplicated in location " + str[1]);
 			if (tmp.size() != 2)
-				throw std::runtime_error("Error in cgi_path location");
+				throw std::runtime_error("invalid number of arguments for cgi_path in location " + str[1]);
 			else
-				loc.cgi_path = tmp[1];
-			
+				loc.cgi_path = tmp[1];			
 		}
 		else if (tmp[0] == "cgi_script")
 		{
 			if (loc.cgi_script.size() != 0)
-				throw std::runtime_error("Error cgi_script is duplicate location");
+				throw std::runtime_error("cgi_script is duplicated in location " + str[1]);
 			if (tmp.size() != 2)
-				throw std::runtime_error("Error in cgi_script location");
+				throw std::runtime_error("invalid number of arguments for cgi_script in location " + str[1]);
 			else
 			{
 				size_t pos = tmp[1].find('.');
 				loc.cgi_extension = tmp[1].substr(pos);
 				loc.cgi_script = tmp[1];
-			}
-			
+			}			
 		}
 		else
-			throw std::runtime_error("Error: bad location");
+			throw std::runtime_error("invalid directive in location " + str[1]);
 		*it++;
 		(*count)++;
 	}
@@ -267,7 +261,7 @@ location pars::check_content_of_location(location loc, pars_server server)
 	if (loc.error_page.size() == 0 && server.error_page.size() != 0)
 		loc.error_page = server.error_page;
 	if ((loc.cgi_path.size() == 0 && loc.cgi_script.size() != 0) || (loc.cgi_path.size() != 0  &&loc.cgi_script.size() == 0))
-		throw std::runtime_error("Error must add cgi_path or cgi_script");
+		throw std::runtime_error("missing cgi_path or cgi_script");
 	return (loc);
 }
 
@@ -275,14 +269,9 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 {
 	std::vector<std::string> tmp;
 	pars_server server;
-	
-	tmp = ft_split(conf[0], " \t");
-	if (tmp[1] != "{")
-		throw std::runtime_error("Error must be add '{' or spase");
+
 	(*count)++;
 	std::vector<std::string>::iterator it = conf.begin() + (*count);
-	if (it == conf.end())
-		throw std::runtime_error("end of file");
 	while (it != conf.end())
 	{
 		tmp = ft_split(*it, " ;");
@@ -291,7 +280,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 		if (tmp[0] == "\tserver_name")
 		{
 			if (server.server_name.size() != 0)
-				throw std::runtime_error("Error server_name is duplicate");
+				throw std::runtime_error("server_name is duplicated");
 			size_t i = 1;
 			while (i < tmp.size())
 			{
@@ -302,14 +291,14 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 		else if (tmp[0] == "\tlisten")
 		{
 			if (tmp.size() != 2)
-				throw std::runtime_error("Error in listen");
+				throw std::runtime_error("listen takes only one argument");
 			std::vector<std::string> str = ft_split(tmp[1], ":");
 			if (str.size() <= 2)
 			{
 				if (str.size() == 1)
 				{
 					if (str[0].find(".") != std::string::npos)
-						throw std::runtime_error("Error in listen");
+						throw std::runtime_error("in listen");
 					server.listen.insert(std::make_pair("127.0.0.1",  parssing_port(atol(str[0].c_str()))));
 				}
 				else
@@ -327,19 +316,19 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 			if (tmp.size() == 2)
 			{
 				if (server.root.size() != 0)
-					throw std::runtime_error("Error root is duplicate");
+					throw std::runtime_error("Error: root is duplicated");
 				else
 					server.root = tmp[1];
 			}
 			else
-				throw std::runtime_error("Error in root");
+				throw std::runtime_error("root takes only one argument");
 		}
 		else if (tmp[0] == "\tindex")
 		{
 			if (server.index.size() != 0)
-				throw std::runtime_error("Error index is duplicate");
+				throw std::runtime_error("index is duplicated");
 			if (tmp.size() == 1)
-				throw std::runtime_error("Error in index");
+				throw std::runtime_error("the index directive needs arguments");
 			size_t i = 1;
 			while (i < tmp.size())
 			{
@@ -351,31 +340,29 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 		{
 			int status = atol(tmp[1].c_str());
 			if (status < 100 || status > 599)
-				throw std::runtime_error("Error in satatus code");
+				throw std::runtime_error("invalid satatus code");
 			if (tmp.size() == 3)
-			{
 				server.error_page.insert(std::make_pair(status, tmp[2]));
-			}
 			else
-				throw std::runtime_error("Error in error_page");
+				throw std::runtime_error("error_page takes only one argument");
 		}
 		else if (tmp[0] == "\tmax_client_body_size")
 		{
 			if (atol(tmp[1].c_str()) < 0)
-				throw std::runtime_error("Error in max_client_body_size");
+				throw std::runtime_error("max_client_body_size must be a positive value");
 			if (tmp.size() == 2)
 				server.max_client_body_size = atol(tmp[1].c_str());
 			else
-				throw std::runtime_error("Error in max_client_body_size");
+				throw std::runtime_error("max_client_body_size takes only one argument");
 		}
 		else if (tmp[0] == "\tallowed_methods")
 		{
 			if (tmp.size() > 4 || tmp.size() == 1)
-				throw std::runtime_error("Error in allowed_methods");
+				throw std::runtime_error("allowed_methods accepts up to 3 arguments");
 			else
 			{
 				if (server.allowed_methods.size() != 0)
-					throw std::runtime_error("Error in allowed_methods is duplicate");
+					throw std::runtime_error("allowed_methods is duplicated");
 				size_t i = 1;
 				while (i < tmp.size())
 				{
@@ -393,10 +380,10 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 				else if (tmp[1] == "off")
 					server.autoindex = false;
 				else
-					throw std::runtime_error("Error in autoindex you must be add 'on' or 'off'");
+					throw std::runtime_error("autoindex accepts only 'on' or 'off' as argument");
 			}
 			else
-				throw std::runtime_error("Error in autoindex");
+				throw std::runtime_error("autoindex takes only one argument");
 		}
 		else if (tmp[0] == "\tlocation")
 		{
@@ -405,7 +392,7 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 			it += *count - move_step;
 		}
 		else
-			throw std::runtime_error("Error in server");
+			throw std::runtime_error("invalid directive in the server block");
 		*it++;
 		(*count)++;
 		
@@ -417,19 +404,19 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 void pars::check_content_if_empty(pars_server server)
 {
 	if (server.listen.size() == 0)
-		throw std::runtime_error("must be add listen");	
+		throw std::runtime_error("listen directive is missing");
 }
 
 void pars::parsing(int ac, char **av)
 {
 	if (ac == 1)
 	{
-		std::cout << "config file not found, use default config file" << std::endl;
+		std::cout << "config file not found, default config file used" << std::endl;
 		av[1] = (char *)"./config_files/config.conf"; 
 		ac++;
 	}
 	if (ac != 2)
-        throw std::invalid_argument("Error whit the argment");
+        throw std::invalid_argument("You should provide one argument");
 	open_file_read(av);
 	check_bracket(conf_file);
 	stock_data();

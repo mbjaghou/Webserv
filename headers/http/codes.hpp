@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codes.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 11:37:54 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/02/16 19:07:38 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/23 16:53:07 by ylabtaim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,6 @@
 #include <fcntl.h>
 #include <ctime>
 #include <string>
-// #include "./../parsing/ServerContext.hpp"
-// #include "./../parsing/ConfigFileParser.hpp"
 
 enum Code
 {

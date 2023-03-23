@@ -1,0 +1,55 @@
+duplicated max_client_body_size
+
+duplicated error_page
+
+duplicated autoindex
+
+duplicated location
+
+max_client_body_size dd;
+
+max_client_body_size 5.9;
+
+allowed_methods GET TEG BLABla;
+
+allowed_methods GET GET GET;
+
+return 301.45 /Users/ylabtaim/Desktop/Webserv/Makefile;
+
+error_page 404.89 /Users/ylabtaim/Desktop/Webserv/error_pages/index.html;
+
+======================================================================================
+this throws basic_string:
+
+```
+server {
+	listen 127.0.0.1:9090;
+	listen 127.0.0.1:8080;
+	index index.php index.html;
+	# max_client_body_size dd;
+	# max_client_body_size 5.9;
+	# allowed_methods GET TEG BLABla;
+	location / {
+		root /Users/ylabtaim/Desktop/Webserv;
+		# return 301.45 /Users/ylabtaim/Desktop/Webserv/Makefile;
+		# error_page 404.89 /Users/ylabtaim/Desktop/Webserv/error_pages/index.html;
+		autoindex on;
+		# autoindex off;
+	}
+
+	location / {
+		# duplicated locat	ion
+	}
+
+	location /cgi-bin {
+		autoindex off;
+		cgi_path /Users/ylabtaim/Desktop/Webserv/cgi-bin/php-cgi;
+		cgi_script /Users/ylabtaim/Desktop/Webserv/cgi-bin/welcome.php;
+	}
+	# location /cgi-bin {
+	# 	autoindex off;
+	# 	cgi_path /usr/bin/python;
+	# 	cgi_script /Users/ylabtaim/Desktop/Webserv/cgi-bin/script.py;
+	# }
+}
+```

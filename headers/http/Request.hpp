@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:03 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/22 18:02:16 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/23 16:53:19 by ylabtaim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
-#include "../../parsing_hpp/parsing.hpp"
+#include "../parsing_hpp/parsing.hpp"
 class Request {
 private:
 	int									_Status;
@@ -56,9 +56,7 @@ public:
 	void updatePath(const std::string & path);
 	void checkMethod(const std::string & path);
 	bool findServer(std::vector<pars_server> const & servers, std::string &buffer);
-	// const ServerContext& GetServerBlock() const;
 	const std::vector<std::string>& GetBody() const;
-	// const LocationContext &GetLocation() const;
 	const std::string &GetMethod() const;
 	const std::string &GetQuery() const;
 	const std::vector<std::string> &getBody() const;
