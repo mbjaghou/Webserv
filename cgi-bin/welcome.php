@@ -1,8 +1,16 @@
-<html>
-<body>
+<?php
+session_start();
 
-Welcome <?php echo $_ENV["name"]; ?><br>
-Your email address is: <?php echo $_ENV["email"]; ?>
+// Set a session variable
+$_SESSION["test_session"] = "test_value";
 
-</body>
-</html> 
+// Check if the session variable is set
+if (isset($_SESSION["test_session"])) {
+  echo "Sessions are working!";
+} else {
+  echo "Sessions are not working.";
+}
+
+// Destroy the session
+session_destroy();
+?>

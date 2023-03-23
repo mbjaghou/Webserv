@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/22 18:55:08 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/23 13:36:27 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,64 +121,94 @@ std::string Response::getEnv(Request const &obj)
 	env.append("SCRIPT_FILENAME=");env.append(obj.getLocation()->cgi_script);env.append("\n");
     env.append("DOCUMENT_ROOT=");env.append(obj.getLocation()->root);env.append("\n");
 	env.append("REDIRECT_STATUS=");env += obj.getLocation()->return_page.first;env.append("\n");
-	env.append("name=toto\n");
-	env.append("email=tata\n");
+	if(obj.getHeaders().find("Cookie") != obj.getHeaders().end())
+	{
+		env.append("HTTP_COOKIE=");env.append(obj.getHeaders().find("Cookie")->second);env.append("\n");
+	}
+   	if (obj.GetMethod() == "POST") {
+	
+		for(std::vector<std::string>::const_iterator it = obj.getBody().begin(); it != obj.getBody().end(); ++it)
+		{
+			std::string str = *it;
+			int count = 0;
+			for(size_t i = 0; i < str.size(); i++)
+			{
+				if (str[i] == '&')
+					count++;
+			}
+			while(count >= 0)
+			{
+				std::string key = str.substr(0, str.find("="));
+				std::string value = str.substr(str.find("=") + 1, str.find("&") - str.find("=") - 1);
+				env.append(key);env.append("=");env.append(value);env.append("\n");
+				str = str.substr(str.find("&") + 1, str.size() - str.find("&") - 1);
+				count--;
+			}
+		}
+	}
+	if (obj.GetMethod() == "DELETE") {
+		env.append("REQUEST_METHOD=DELETE\n");
+	}
 	env.append("");
-    return env;
+	return env;
 }
 
 std::string Response::cgi(Request const &obj){
-	std::vector<std::string> envp = ft_split(getEnv(obj), "\n");
-	char **env = new char*[envp.size() + 1];
-	for (size_t i = 0; i < envp.size(); ++i) {
-		env[i] = new char[envp[i].size() + 1];
-		strcpy(env[i], envp[i].c_str());
-	}
-	env[envp.size()] = NULL;
-	std::string cgi_path = obj.getLocation()->cgi_path;
-	std::string cgi_script = obj.getLocation()->cgi_script;
-	if(access(cgi_script.c_str(), F_OK) == -1 || access(cgi_path.c_str(), X_OK) == -1)
-		return sendErrorPage(500);
-	char* argv[] = {const_cast<char*>(cgi_path.c_str()), const_cast<char *>(cgi_script.c_str()), NULL};
-	int pipefd[2];
-	std::ostringstream	headers;
-	if(pipe(pipefd) == -1)
-		return sendErrorPage(500);
-	pid_t pid = fork();
-	if (pid == -1)
-		return sendErrorPage(500);
-	else if(pid == 0) // child process
-	{
-		dup2(pipefd[1], 1);
-		close(pipefd[0]);
-		execve(argv[0], argv, env);
-		return sendErrorPage(500);
-	}
-	else // parent process
-	{
-		close(pipefd[1]);
-		std::string cgi_output;
-		char buffer[1024];
-		ssize_t bytes_read;
-		while ((bytes_read = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
-			cgi_output.append(buffer, bytes_read);
+    std::vector<std::string> envp = ft_split(getEnv(obj), "\n");
+    char **env = new char*[envp.size() + 1];
+    for (size_t i = 0; i < envp.size(); ++i) {
+        env[i] = new char[envp[i].size() + 1];
+        strcpy(env[i], envp[i].c_str());
+    }
+    env[envp.size()] = NULL;
+    std::string cgi_path = obj.getLocation()->cgi_path;
+    std::string cgi_script = obj.getLocation()->cgi_script;
+    if(access(cgi_script.c_str(), F_OK) == -1 || access(cgi_path.c_str(), X_OK) == -1)
+        return sendErrorPage(500);
+    char* argv[] = {const_cast<char*>(cgi_path.c_str()), const_cast<char *>(cgi_script.c_str()), NULL};
+    int pipefd[2];
+    std::ostringstream	headers;
+	headers << "HTTP/1.1 200 OK\r\n";
+    if(pipe(pipefd) == -1)
+        return sendErrorPage(500);
+    pid_t pid = fork();
+    if (pid == -1)
+        return sendErrorPage(500);
+    else if(pid == 0) // child process
+    {
+        dup2(pipefd[1], 1);
+        close(pipefd[0]);
+        execve(argv[0], argv, env);
+        return sendErrorPage(500);
+    }
+    else // parent process
+    {
+        close(pipefd[1]);
+        std::string cgi_output;
+        char buffer[1024];
+        ssize_t bytes_read;
+        while ((bytes_read = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
+            cgi_output.append(buffer, bytes_read);
+        }
+        close(pipefd[0]);
+		if(cgi_output.find("\r\n\r\n") != std::string::npos)
+		{
+			headers << cgi_output.substr(0, cgi_output.find("\r\n\r\n") + 2);
+			cgi_output = cgi_output.substr(cgi_output.find("\r\n\r\n") + 4, cgi_output.size() - cgi_output.find("\r\n\r\n") - 4);
 		}
-		close(pipefd[0]);
-		int status;
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-			headers << "HTTP/1.1 200 OK\r\n"
-			<< "Date: " << _Headers["Date"] << "\r\n"
-			<< "Content-Type: " << "text/html\r\n"
-			<< "Content-Length: " << cgi_output.size() << "\r\n"
-			<< "Connection: close\r\n\r\n";
+        int status;
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+            
+            headers << "Date: " << _Headers["Date"] << "\r\n"
+            << "Content-Length: " << cgi_output.size() << "\r\n"
+            << "Connection: close\r\n\r\n";
             return (headers.str() + cgi_output);
-		}
-		else
-			return sendErrorPage(500);
-        
-	}
-	return sendErrorPage(500);
+        }
+        else
+            return sendErrorPage(500);
+    }
+    return sendErrorPage(500);
 }
 
 std::string Response::sendHeaders(const std::string &filename) {
