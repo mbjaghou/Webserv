@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/23 12:39:00 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/23 13:59:39 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,8 @@ int server::start_server(pars pars)
 					else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
 						response[i] = res.uploadFile();
 					else if (req.GetMethod() == "POST" && req.getLocation()->cgi_path.compare("") != 0)
+						response[i] = res.cgi(req);
+					else if (req.GetMethod() == "DELETE" && req.getLocation()->cgi_path.compare("") != 0)
 						response[i] = res.cgi(req);
 					else if (req.GetMethod() == "DELETE")
 						response[i] = res.deleteFile(req.getPath());

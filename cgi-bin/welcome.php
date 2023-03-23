@@ -1,16 +1,7 @@
 <?php
-session_start();
-
-// Set a session variable
-$_SESSION["test_session"] = "test_value";
-
-// Check if the session variable is set
-if (isset($_SESSION["test_session"])) {
-  echo "Sessions are working!";
+if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+    echo 'request method is DELETE';
 } else {
-  echo "Sessions are not working.";
+    echo 'Invalid request method';
 }
-
-// Destroy the session
-session_destroy();
 ?>
