@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/23 22:53:42 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/24 00:33:02 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 
 	if (str[2] != "{")
 		throw std::runtime_error("location's line must end with '{'");
-	loc.uploade_path = str[1];
+	loc.location_path = str[1];
 	(*count)++;
 	std::vector<std::string>::iterator it = conf.begin() + (*count);
 	if (it == conf.end())
@@ -266,7 +266,13 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 			if (tmp.size() != 2)
 				throw std::runtime_error("invalid number of arguments for cgi_path in location " + str[1]);
 			else
-				loc.cgi_path = tmp[1];			
+			{
+				if (server.root.size() != 0 && loc.root.size() == 0)
+					loc.cgi_path = server.root + loc.location_path + "/" + tmp[1];
+				else
+					loc.cgi_path = loc.root + loc.location_path + "/" + tmp[1];
+			}
+				
 		}
 		else if (tmp[0] == "cgi_script")
 		{
@@ -275,7 +281,24 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 			if (tmp.size() != 2)
 				throw std::runtime_error("invalid number of arguments for cgi_script in location " + str[1]);
 			else
-				loc.cgi_script = tmp[1];		
+			{
+				if (server.root.size() != 0 && loc.root.size() == 0)
+					loc.cgi_script = server.root + loc.location_path + "/" + tmp[1];
+				else
+					loc.cgi_script = loc.root + loc.location_path + "/" + tmp[1];
+			}	
+		}
+		else if (tmp[0] == "upload_store")
+		{
+			if (loc.upload_store.size() != 0)
+				throw std::runtime_error("upload_store is duplicated in location " + str[1]);
+			if (tmp.size() != 2)
+				throw std::runtime_error("invalid number of arguments for upload_store in location " + str[1]);
+			else
+			{
+				loc.upload_store = tmp[1];
+				locations_upload.push_back(loc);
+			}
 		}
 		else
 			throw std::runtime_error("invalid directive in location " + str[1]);

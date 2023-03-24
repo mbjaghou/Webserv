@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/23 15:35:02 by ylabtaim         ###   ########.fr       */
+/*   Updated: 2023/03/24 00:47:01 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ int server::start_server(pars pars)
 					if (res.getStatus() != OK)
 						response[i] = res.sendErrorPage(res.getStatus());
 					else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
-						response[i] = res.uploadFile();
+						response[i] = res.uploadFile(pars, req.getReqPath());
 					else if (req.GetMethod() == "POST" && req.getLocation()->cgi_path.compare("") != 0)
 						response[i] = res.cgi(req);
 					else if (req.GetMethod() == "DELETE" && req.getLocation()->cgi_path.compare("") != 0)

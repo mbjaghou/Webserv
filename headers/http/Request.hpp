@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:03 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/23 16:53:19 by ylabtaim         ###   ########.fr       */
+/*   Updated: 2023/03/24 00:44:45 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ private:
 	std::string 						_Buffer;
 	std::string							_Method;
 	std::string							_Path;
+	std::string							_ReqPath;
 	std::string							_Query;
 	std::map<std::string, std::string>	_Headers;
 	std::map<std::string, std::string>	_QueryMap;
@@ -31,7 +32,7 @@ private:
 	std::map<int, std::string>			_ErrorPage;
 	std::string							_Index;
 	bool								_AutoIndex;
-	const location*				_Location;
+	const location*						_Location;
 
 public:
 	Request(std::string & buffer, pars const &config);
@@ -48,6 +49,7 @@ public:
 	const std::map<std::string, std::string> &getHeaders() const;
 	const int &getStatus() const;
 	const std::string &getPath() const;
+	const std::string &getReqPath() const;
 	const std::string &getHost() const;
 	const std::string &getIndex() const;
 	const std::map<int, std::string> &getErrorPage() const;

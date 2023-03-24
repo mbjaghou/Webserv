@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/23 14:00:23 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/24 01:20:30 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,15 +51,23 @@ std::string Response::deleteFile(std::string const & path) {
 	return headers.str();
 }
 
-std::string Response::uploadFile() {
+std::string Response::uploadFile(pars &pars, const std::string &path) {
 	std::string 	body;
 	std::string		filename;
 	std::string		boundary;
 	std::string		content;
+	std::string		upload_path;
 	size_t			pos;
 	size_t			delpos;
 	size_t			endpos;
 
+	for (size_t i = 0; i < pars.locations_upload.size(); ++i) {
+		//// check if pars.locations_upload[i].location_path does not end with '/'
+		if (pars.locations_upload[i].location_path + "/" == path) {
+			upload_path = pars.locations_upload[i].upload_store;
+		}
+	}
+	upload_path.append("/");//// check if upload_path does not end with '/'
 	pos = _Headers["Content-Type"].find("boundary");
 	if (pos == std::string::npos)
 		return sendErrorPage(BadRequest);
@@ -76,7 +84,7 @@ std::string Response::uploadFile() {
 		if (pos == std::string::npos || endpos == std::string::npos)
 			return sendErrorPage(BadRequest);
 		filename = body.substr(pos + 10, endpos - pos - 10);
-		if (pathIsFile("./uploads/" + filename) == 1)
+		if (pathIsFile(upload_path + filename) == 1)
 			return sendErrorPage(BadRequest);
 
 		pos = body.find("\r\n\r\n", delpos);
@@ -85,7 +93,7 @@ std::string Response::uploadFile() {
 			return sendErrorPage(BadRequest);
 		content = body.substr(pos + 4, endpos - pos - 6);
 
-		file.open("./uploads/" + filename);
+		file.open(upload_path + filename);
 		if (!file.is_open())
 			return sendErrorPage(BadRequest);
 		file << content;

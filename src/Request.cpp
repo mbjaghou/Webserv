@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/23 21:09:05 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/24 01:04:17 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,8 @@ void Request::updatePath(const std::string & path) {
 	bool enter = false;
 	for (i = 0; i < locations.size(); ++i){
 		enter = true;
-		if (!strncmp(locations[i].uploade_path.c_str(), path.c_str(), locations[i].uploade_path.size())) {
-			if (locations[i].return_page.first != 0 && locations[i].uploade_path == path) {
+		if (!strncmp(locations[i].location_path.c_str(), path.c_str(), locations[i].location_path.size())) {
+			if (locations[i].return_page.first != 0 && locations[i].location_path == path) {
 				_Status = locations[i].return_page.first;
 				_Headers["Location"] = locations[i].return_page.second;
 			}
@@ -156,7 +156,7 @@ void Request::checkMethod(const std::string &path) {
 	std::vector<std::string> methods;
 
 	for (std::size_t i = 0; i < locations.size(); ++i) {
-		if (path == locations[i].uploade_path) {
+		if (path == locations[i].location_path) {
 			methods = locations[i].allowed_methods;
 			break ;
 		}
@@ -185,6 +185,7 @@ void Request::ParseStartLine(std::string & str) {
 		if (StartLine[1].size() > 2000)
 			_Status = URITooLong;
 		std::vector<std::string> RequestTarget = ft_split(StartLine[1], "?");
+		_ReqPath = RequestTarget[0];
 		updatePath(RequestTarget[0]);
 		if (_Status >= 300 && _Status < 400) return;
 		if (pathIsFile(_Path) == 1) {
@@ -289,6 +290,10 @@ const int &Request::getStatus() const {
 
 const std::string &Request::getPath() const {
 	return _Path;
+}
+
+const std::string &Request::getReqPath() const {
+	return _ReqPath;
 }
 
 const std::string &Request::getHost() const {

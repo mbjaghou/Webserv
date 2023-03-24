@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_location.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:18:29 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/23 14:19:05 by ylabtaim         ###   ########.fr       */
+/*   Updated: 2023/03/24 00:11:19 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ location::~location()
 {
 }
 
-void location::set_uploade_path(std::string uploade_path)
+void location::set_location_path(std::string location_path)
 {
-	this->uploade_path = uploade_path;
+	this->location_path = location_path;
 }
 
 void location::set_root(std::string root)
@@ -39,9 +39,9 @@ void location::set_index(std::vector<std::string> index)
 	this->index = index;
 }
 
-std::string location::get_uploade_path(void)
+std::string location::get_location_path(void)
 {
-	return (uploade_path);
+	return (location_path);
 }
 
 std::vector<std::string> location::get_index(void)
