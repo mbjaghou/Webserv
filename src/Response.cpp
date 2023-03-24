@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/24 01:20:30 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/24 15:40:26 by ylabtaim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,15 @@ std::string Response::uploadFile(pars &pars, const std::string &path) {
 	size_t			endpos;
 
 	for (size_t i = 0; i < pars.locations_upload.size(); ++i) {
-		//// check if pars.locations_upload[i].location_path does not end with '/'
-		if (pars.locations_upload[i].location_path + "/" == path) {
+		std::string loc_path = pars.locations_upload[i].location_path;
+		if (loc_path[loc_path.size() - 1] != '/')
+			loc_path.append("/");
+		if (loc_path == path)
 			upload_path = pars.locations_upload[i].upload_store;
-		}
 	}
-	upload_path.append("/");//// check if upload_path does not end with '/'
+	if (upload_path[upload_path.size() - 1] != '/')
+		upload_path.append("/");
+
 	pos = _Headers["Content-Type"].find("boundary");
 	if (pos == std::string::npos)
 		return sendErrorPage(BadRequest);
@@ -93,7 +96,7 @@ std::string Response::uploadFile(pars &pars, const std::string &path) {
 			return sendErrorPage(BadRequest);
 		content = body.substr(pos + 4, endpos - pos - 6);
 
-		file.open(upload_path + filename);
+		file.open("./" + upload_path + filename);
 		if (!file.is_open())
 			return sendErrorPage(BadRequest);
 		file << content;
