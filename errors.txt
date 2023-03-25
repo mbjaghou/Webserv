@@ -62,11 +62,11 @@ initialize the autoindex "" // fixed
 static variable // fixed 
 duplicated autoindex && max_client_body_size // fixed
 
+duplicated location // fixed
+initialize the allowed_methods whit GET POST DELETE //fixed
 
-listen 127.0.0.1:9090; // if 2 servers listens to the same host:port there must not be an error
 
-duplicated location
 
-initialize the allowed_methods whit GET POST DELETE
 
 upload is not working
+listen 127.0.0.1:9090; // if 2 servers listens to the same host:port there must not be an error

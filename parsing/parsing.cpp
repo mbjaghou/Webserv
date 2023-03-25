@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/25 00:57:24 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/25 01:16:45 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,14 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 	if (str[2] != "{")
 		throw std::runtime_error("location's line must end with '{'");
 	loc.location_path = str[1];
+	size_t i = 0;
+	while (i < server.location.size())
+	{
+		std::string tmp = server.location[i].location_path;
+		if (tmp == str[1])
+			throw std::runtime_error("location is duplicate");
+		i++;
+	}
 	(*count)++;
 	std::vector<std::string>::iterator it = conf.begin() + (*count);
 	if (it == conf.end())
