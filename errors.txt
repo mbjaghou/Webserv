@@ -61,7 +61,6 @@ max_client_body_size of location is ignored // fixed
 initialize the autoindex "" // fixed
 static variable // fixed 
 duplicated autoindex && max_client_body_size // fixed
-
 duplicated location // fixed
 initialize the allowed_methods whit GET POST DELETE //fixed
 
