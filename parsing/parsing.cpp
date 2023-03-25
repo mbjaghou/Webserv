@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/24 00:33:02 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/25 00:57:24 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,41 +206,27 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 		}
 		else if (tmp[0] == "autoindex")
 		{
-			static int count = 0;
 			if (tmp.size() == 2)
 			{
-				if (tmp[1] == "on" && count == 0)
+				if (tmp[1] == "on")
 				{
-					server.autoindex = true;
-					count++;
+					loc.autoindex = true;
+					loc.count_autoindex++;
+					if (loc.count_autoindex != 1)
+						throw std::runtime_error("autoindex is duplicated in location " + str[1]);
 				}
-				else if (tmp[1] == "off" && count == 0)
+				else if (tmp[1] == "off")
 				{
-					server.autoindex = false;
-					count++;
+					loc.autoindex = false;
+					loc.count_autoindex++;
+					if (loc.count_autoindex != 1)
+						throw std::runtime_error("autoindex is duplicated in location " + str[1]);
 				}
 				else
 					throw std::runtime_error("autoindex accepts only 'on' or 'off' as argument or is duplicated in location " + str[1]);
 			}
 			else
 				throw std::runtime_error("invalid number of arguments for autoindex in location " + str[1]);
-		}
-		else if (tmp[0] == "max_client_body_size")
-		{
-			static int count = 0;
-			if (isNumber(tmp[1]) == false)
-				throw std::runtime_error("max_client_body_size must be a number in location " + str[1]);
-			if (atoi(tmp[1].c_str()) < 0)
-				throw std::runtime_error("max_client_body_size is negative in location " + str[1]);
-			if (tmp.size() == 2 && count == 0)
-			{
-				server.max_client_body_size = atol(tmp[1].c_str());
-				count++;
-			}
-			else if (tmp.size() == 2 && count != 0)
-				throw std::runtime_error("max_client_body_size is duplicated in location " + str[1]);
-			else
-				throw std::runtime_error("invalid number of arguments for max_client_body_size in location " + str[1]);
 		}
 		else if (tmp[0] == "error_page")
 		{
@@ -317,8 +303,6 @@ location pars::check_content_of_location(location loc, pars_server server)
 		loc.index = server.index;
 	if (loc.allowed_methods.size() == 0 && server.allowed_methods.size() != 0)
 		loc.allowed_methods = server.allowed_methods;
-	if (loc.max_client_body_size == 1 && server.max_client_body_size != 1)
-		loc.max_client_body_size = server.max_client_body_size;
 	if (loc.error_page.size() == 0 && server.error_page.size() != 0)
 		loc.error_page = server.error_page;
 	if ((loc.cgi_path.size() == 0 && loc.cgi_script.size() != 0) || (loc.cgi_path.size() != 0  &&loc.cgi_script.size() == 0))
@@ -424,17 +408,18 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 		}
 		else if (tmp[0] == "\tmax_client_body_size")
 		{
-			static int count = 0;
 			if (isNumber(tmp[1]) == false)
 				throw std::runtime_error("max_client_body_size must be a number");
 			if (atoi(tmp[1].c_str()) < 0)
 				throw std::runtime_error("max_client_body_size must be a positive value");
-			if (tmp.size() == 2 && count == 0)
+			if (tmp.size() == 2)
 			{
+				server.count_max_client_body_size++;
+				if (server.count_max_client_body_size != 1)
+					throw std::runtime_error("max_client_body_size is duplicated");
 				server.max_client_body_size = atol(tmp[1].c_str());
-				count++;
 			}
-			else if (tmp.size() == 2 && count != 0)
+			else if (tmp.size() == 2)
 				throw std::runtime_error("max_client_body_size is duplicated");
 			else
 				throw std::runtime_error("max_client_body_size takes only one argument");
@@ -461,21 +446,19 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 		}
 		else if (tmp[0] == "\tautoindex")
 		{
-			static int count = 0;
-			if (tmp.size() == 2)
+			if (tmp[1] == "on")
 			{
-				if (tmp[1] == "on" && count == 0)
-				{
-					server.autoindex = true;
-					count++;
-				}
-				else if (tmp[1] == "off" && count == 0)
-				{
-					server.autoindex = false;
-					count++;
-				}
-				else
-					throw std::runtime_error("autoindex accepts only 'on' or 'off' as argument or is duplicated");
+				server.autoindex = true;
+				server.count_autoindex++;
+				if (server.count_autoindex != 1)
+					throw std::runtime_error("autoindex is duplicated");
+			}
+			else if (tmp[1] == "off")
+			{
+				server.autoindex = false;
+				server.count_autoindex++;
+				if (server.count_autoindex != 1)
+					throw std::runtime_error("autoindex is duplicated");
 			}
 			else
 				throw std::runtime_error("autoindex takes only one argument");

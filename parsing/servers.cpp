@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   servers.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:05 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/23 14:22:53 by ylabtaim         ###   ########.fr       */
+/*   Updated: 2023/03/25 00:23:07 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 pars_server::pars_server()
 {
 	root = "";
-	autoindex = "";
 	max_client_body_size = 1;
+	autoindex = false;
+	count_autoindex = 0;
+	count_max_client_body_size = 0;
 }
 pars_server::~pars_server(){
 }

@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:06:15 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/20 18:26:20 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/25 00:20:59 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ class pars_server
 		std::vector<location> 	 					location;
 		bool 										autoindex;
 		std::multimap<std::string, long>			listen;
+		int											count_autoindex;
+		int											count_max_client_body_size;
 
 
 		std::vector<std::string> 		get_server_name(void);

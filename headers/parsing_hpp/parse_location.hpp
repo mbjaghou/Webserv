@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 17:16:39 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/24 00:24:47 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/25 00:55:36 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,11 @@ class location
 		std::pair<int, std::string> 	return_page;
 		std::vector<std::string> 		allowed_methods;
 		bool							autoindex;
-		long 							max_client_body_size;
 		std::map<int, std::string> 		error_page;
 		std::string 					cgi_path;
 		std::string 					cgi_script;
 		std::string 					upload_store;
-
+		int 							count_autoindex;
 
 		void set_location_path(std::string location_path);
 		void set_root(std::string root);

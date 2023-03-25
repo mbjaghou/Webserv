@@ -13,9 +13,9 @@ int main(int ac, char **av)
 		{
 			// for (std::map<std::string, long>::iterator it = pars.parssing[i].listen.begin(); it != pars.parssing[i].listen.end(); it++)
 			// 	std::cout << "listen: " << it->first << " " << it->second << std::endl;
-			for (std::map<int, std::string>::iterator it = pars.parssing[i].error_page.begin(); it != pars.parssing[i].error_page.end(); it++)
-				std::cout << "error_page: " << it->first << " " << it->second << std::endl;
-			// std::cout << "root: " << pars.parssing[i].get_root() << std::endl;
+			// for (std::map<int, std::string>::iterator it = pars.parssing[i].error_page.begin(); it != pars.parssing[i].error_page.end(); it++)
+			// 	std::cout << "error_page: " << it->first << " " << it->second << std::endl;
+			// // std::cout << "root: " << pars.parssing[i].get_root() << std::endl;
 			std::cout << "max_client_body_size: " << pars.parssing[i].get_max_client_body_size() << std::endl;
 			// std::cout << "autoindex: " << pars.parssing[i].get_autoindex() << std::endl;
 			// for (std::vector<std::string>::iterator it = pars.parssing[i].get_server_name().begin(); it != pars.parssing[i].get_server_name().end(); it++)
@@ -28,9 +28,13 @@ int main(int ac, char **av)
 			std::cout << "\033[32m" << "start location" << "\033[0m" << std::endl;
 			while (++j < pars.parssing[i].location.size())
 			{
-				std::cout << "location cgi_path : " << pars.parssing[i].location[j].cgi_path << std::endl;
-				std::cout << "location cgi_script : " << pars.parssing[i].location[j].cgi_script << std::endl;
-				std::cout << "location upload_store : " << pars.parssing[i].location[j].upload_store << std::endl;
+				// std::cout << "location cgi_path : " << pars.parssing[i].location[j].cgi_path << std::endl;
+				// std::cout << "location cgi_script : " << pars.parssing[i].location[j].cgi_script << std::endl;
+				// std::cout << "location upload_store : " << pars.parssing[i].location[j].upload_store << std::endl;
+				std::cout << "location autoindex =" << pars.parssing[i].location[j].autoindex << std::endl;
+				std::vector<std::string>::iterator it = pars.parssing[i].location[j].allowed_methods.begin();
+				for (;it != pars.parssing[i].location[j].allowed_methods.end(); ++it)
+					std::cout << "location allowed_methods =" << *it << std::endl;
 			}
 			
 		}

@@ -57,9 +57,16 @@ server {
 	# }
 }
 ```
+max_client_body_size of location is ignored // fixed
+initialize the autoindex "" // fixed
+static variable // fixed 
+duplicated autoindex && max_client_body_size // fixed
+
 
 listen 127.0.0.1:9090; // if 2 servers listens to the same host:port there must not be an error
 
 duplicated location
 
-max_client_body_size of location is ignored
+initialize the allowed_methods whit GET POST DELETE
+
+upload is not working
