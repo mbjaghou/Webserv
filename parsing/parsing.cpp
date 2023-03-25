@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/25 01:16:45 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/25 16:47:36 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,10 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 					throw std::runtime_error("duplicated methods in allowed_methods in location " + str[1]);
 			}
 		}
+		else if (tmp[0] == "listen")
+			throw std::runtime_error("listen directive cannot be in a location");
+		else if (tmp[0] == "max_client_body_size")
+			throw std::runtime_error("max_client_body_size directive cannot be in a location");
 		else if (tmp[0] == "return")
 		{
 			int status;

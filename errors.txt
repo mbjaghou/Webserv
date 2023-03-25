@@ -64,8 +64,8 @@ duplicated autoindex && max_client_body_size // fixed
 duplicated location // fixed
 initialize the allowed_methods whit GET POST DELETE //fixed
 
+upload is not working //fixed
 
 
 
-upload is not working
 listen 127.0.0.1:9090; // if 2 servers listens to the same host:port there must not be an error

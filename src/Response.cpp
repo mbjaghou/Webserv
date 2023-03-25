@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/25 01:38:27 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/25 16:52:32 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,53 +334,4 @@ std::string Response::getLink(std::string const &dirEntry, std::string const &di
 
 const int &Response::getStatus() const {
 	return _Status;
-}
-
-void Response::parseCgiOutput(std::string &input, std::ostringstream &header, std::string const &ex) {
-	std::istringstream s(input);
-	std::string buff;
-	time_t raw;
-	std::string tm;
-	time(&raw);
-	tm = ctime(&raw);
-	tm.pop_back();
-	std::string body;
-	header << "HTTP/1.1" << " " << _Status << " " << ReasonPhrase(_Status) << "\r\n" << "Server: WebServ\r\n" << "Date: " << tm << " GMT\r\n" << "Connection: " << _Headers["Connection"] << "\r\n";
-	if (ex.compare(".php") == 0) {
-		while (std::getline(s, buff)) {
-			if (buff.find("X-Powered-By:") != std::string::npos) {
-				header << "X-Powered-By: "  << buff.substr(buff.find(": ") + 2) << "\r\n";
-			}
-			else if (buff.find("Set-Cookie:") != std::string::npos){
-				header << "Set-Cookie: " <<  buff.substr(buff.find(": ") + 2) << "\r\n";
-			}
-			else if (buff.find("Expires:") != std::string::npos){
-				header << "Expires: " << buff.substr(buff.find(": ") + 2) << "\r\n";
-			}
-			else if (buff.find("Cache-Control:") != std::string::npos) {
-				header << "Cache-Control: " << buff.substr(buff.find(": ") + 2) << "\r\n";
-			}
-			else if (buff.find("Pragma:") != std::string::npos) {
-				header << "Pragma: " << buff.substr(buff.find(": ") + 2) << "\r\n";
-			}
-			else if (buff.find("Content-type:") != std::string::npos) {
-				header << "Content-type: " <<  buff.substr(buff.find(": ") + 2) << "\r\n";
-			}
-			else if (buff.compare("\r\n\r\n") == 0)
-				break;
-		}
-		body = input.substr(input.find("\r\n\r\n") + 4);
-	}
-	else if (ex.compare(".py") == 0) {
-		while (std::getline(s, buff))
-		{
-			if (buff.find("Content-type:") != std::string::npos)
-				header << "Content-type: " << buff.substr(buff.find(": ") + 2) << "\r\n";
-		}
-		body = input.substr(input.find("\n\n") + 1);
-	}
-	// header << "\r\n";
-	header << "Content-Length: " + std::to_string(input.size());
-	header << "\r\n\r\n";
-	header << body;
 }
