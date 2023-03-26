@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:21:49 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/23 16:53:39 by ylabtaim         ###   ########.fr       */
+/*   Updated: 2023/03/26 18:10:40 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class server
         int server_recv;
     public:
         std::vector<std::pair<int, sockaddr_in> > Server;
-        std::multimap<std::string, long> 		  server_listen;
+        std::map<long, std::string> 		  server_listen;
         server();
         int socket_server_start(void);
         int select_socket(fd_set read_fd, int max);

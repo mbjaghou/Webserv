@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/26 16:12:24 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/26 18:14:36 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,16 @@ void server::stock_address_port(pars pars)
 	while (++j < pars.parssing.size())
 	{	
 		for (std::multimap<std::string, long>::iterator it = pars.parssing[j].listen.begin(); it != pars.parssing[j].listen.end(); ++it)
-		{
-			std::cout << "http://" << it->first << ":" << it->second << '\n';
-			server_listen.insert(std::pair<std::string, int>(it->first, it->second));
-		}
+			server_listen.insert(std::pair<int,std::string>(it->second, it->first));
 	}
 }
 
 
 int server::socket_server_start(void)
 {
-	for (std::multimap<std::string, long>::iterator it = server_listen.begin(); it != server_listen.end(); ++it)
+	for (std::map<long, std::string>::iterator it = server_listen.begin(); it != server_listen.end(); ++it)
 	{
+		std::cout << "http://" << it->second << ":" << it->first << '\n';
 		int server_socket;
 		struct sockaddr_in addr; 
 		if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -42,8 +40,8 @@ int server::socket_server_start(void)
 		fcntl(server_socket, F_SETFL, O_NONBLOCK);
 		bzero(&addr, sizeof(addr));
 		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = inet_addr(it->first.c_str());
-		addr.sin_port = htons(it->second);
+		addr.sin_addr.s_addr = inet_addr(it->second.c_str());
+		addr.sin_port = htons(it->first);
 		memset(addr.sin_zero, 0, sizeof addr.sin_zero);
 		int server_bind;
 		if ((server_bind = bind(server_socket, (struct sockaddr *)&addr, sizeof(addr))) < 0)
