@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:56 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/24 00:33:00 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/26 17:07:00 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class pars
         std::vector<pars_server> parssing;
         std::string				 conf_file;
 		std::vector<location>	 locations_upload;
+		
 		pars();
 		~pars();
 		void pars_root();

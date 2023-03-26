@@ -6,7 +6,7 @@
 /*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/25 16:47:36 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/26 17:06:53 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,11 +355,23 @@ pars_server pars::parsing_servers(std::vector<std::string> conf, size_t *count)
 				if (str.size() == 1)
 				{
 					if (str[0].find(".") != std::string::npos)
-						throw std::runtime_error("in listen");
+						throw std::runtime_error("Error in listen");
+					std::multimap<std::string, long>::iterator  it;
+					for (it = server.listen.begin(); it != server.listen.end(); ++it)
+					{
+						if (it->second == atol(str[0].c_str()))
+							throw std::runtime_error("Error address listen is duplicated");
+					}
 					server.listen.insert(std::make_pair("127.0.0.1",  parssing_port(atol(str[0].c_str()))));
 				}
 				else
 				{
+					std::multimap<std::string, long>::iterator  it;
+					for (it = server.listen.begin(); it != server.listen.end(); ++it)
+					{
+						if (it->second == atol(str[1].c_str()))
+							throw std::runtime_error("Error address listen is duplicated");
+					}
 					if (str[0] == "localhost")
 						server.listen.insert(std::make_pair("127.0.0.1", parssing_port(atol(str[1].c_str()))));
 					else
