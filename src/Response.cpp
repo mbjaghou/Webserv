@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/25 16:52:32 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/26 22:46:22 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ std::string Response::cgi(Request const &obj){
     if(access(cgi_script.c_str(), F_OK) == -1 || access(cgi_path.c_str(), X_OK) == -1)
         return sendErrorPage(500);
     char* argv[] = {const_cast<char*>(cgi_path.c_str()), const_cast<char *>(cgi_script.c_str()), NULL};
-    int pipefd[2];
+	int pipefd[2];
     std::ostringstream	headers;
 	headers << "HTTP/1.1 200 OK\r\n";
     if(pipe(pipefd) == -1)

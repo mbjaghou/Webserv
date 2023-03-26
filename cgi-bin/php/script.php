@@ -1,12 +1,18 @@
 <?php
+
 session_start();
-if(isset($_COOKIE["visited"])){
-    $visited = $_COOKIE["visited"] + 1;
-    setcookie("visited", $visited, time() + 60);
+if (!isset($_SESSION['counter'])) {
+  $_SESSION['counter'] = 0;
+} else {
+  $_SESSION['counter']++;
 }
-else{
-    setcookie("visited", 1, time() + 1);
-    $visited = 1;
+
+if (!isset($_COOKIE['user'])) {
+  $user = "guest";
+  setcookie("user", $user);
+} else {
+  $user = $_COOKIE['user'];
 }
-echo "You have visited this page ".$visited." times.<br>";
+echo "You have visited this page " . $_SESSION['counter'] . " times. <br>";
+echo "Your name is " . $user . ". <br>";
 ?>

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/26 17:06:53 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/26 22:05:20 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,12 +264,7 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 			if (tmp.size() != 2)
 				throw std::runtime_error("invalid number of arguments for cgi_path in location " + str[1]);
 			else
-			{
-				if (server.root.size() != 0 && loc.root.size() == 0)
-					loc.cgi_path = server.root + loc.location_path + "/" + tmp[1];
-				else
-					loc.cgi_path = loc.root + loc.location_path + "/" + tmp[1];
-			}
+					loc.cgi_path = tmp[1];
 				
 		}
 		else if (tmp[0] == "cgi_script")
