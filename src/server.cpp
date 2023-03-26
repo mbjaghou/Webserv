@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/24 00:47:01 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/26 16:12:24 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void server::stock_address_port(pars pars)
 	{	
 		for (std::multimap<std::string, long>::iterator it = pars.parssing[j].listen.begin(); it != pars.parssing[j].listen.end(); ++it)
 		{
-			std::cout << it->first << " => " << it->second << '\n';
+			std::cout << "http://" << it->first << ":" << it->second << '\n';
 			server_listen.insert(std::pair<std::string, int>(it->first, it->second));
 		}
 	}

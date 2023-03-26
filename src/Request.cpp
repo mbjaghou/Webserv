@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/24 01:04:17 by mbjaghou         ###   ########.fr       */
+/*   Updated: 2023/03/26 01:06:02 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void Request::RequestParsing() {
 				if (i != req.size() - 1)
 					body.append("\r\n\r\n");
 			}
-			if ((body.size() > _Server->max_client_body_size * 1000000)){
+			if ((body.size() > _Server->max_client_body_size * 1048576)){
 				_Status = PayloadTooLarge;
 				return ;
 			}
