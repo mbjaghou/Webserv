@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/26 22:46:22 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 14:13:16 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ std::string Response::getEnv(Request const &obj)
 {
 	std::string env;
     env.append("SERVER_SOFTWARE=webserv\n");
-    env.append("SERVER_NAME=localhost\n");// mn b3d
+    env.append("SERVER_NAME=localhost\n");
     env.append("GATEWAY_INTERFACE=CGI/1.1\n");
     env.append("SERVER_PROTOCOL=HTTP/1.1\n");
     env.append("SERVER_PORT=");env.append(obj.getPort());env.append("\n");
@@ -130,11 +130,8 @@ std::string Response::getEnv(Request const &obj)
     env.append("DOCUMENT_ROOT=");env.append(obj.getLocation()->root);env.append("\n");
 	env.append("REDIRECT_STATUS=");env += obj.getLocation()->return_page.first;env.append("\n");
 	if(obj.getHeaders().find("Cookie") != obj.getHeaders().end())
-	{
 		env.append("HTTP_COOKIE=");env.append(obj.getHeaders().find("Cookie")->second);env.append("\n");
-	}
    	if (obj.GetMethod() == "POST") {
-	
 		for(std::vector<std::string>::const_iterator it = obj.getBody().begin(); it != obj.getBody().end(); ++it)
 		{
 			std::string str = *it;
@@ -181,14 +178,14 @@ std::string Response::cgi(Request const &obj){
     pid_t pid = fork();
     if (pid == -1)
         return sendErrorPage(500);
-    else if(pid == 0) // child process
+    else if(pid == 0)
     {
         dup2(pipefd[1], 1);
         close(pipefd[0]);
         execve(argv[0], argv, env);
         return sendErrorPage(500);
     }
-    else // parent process
+    else
     {
         close(pipefd[1]);
         std::string cgi_output;
