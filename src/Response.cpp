@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/27 21:04:48 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 21:23:16 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,8 @@ std::string Response::cgi(Request const &obj){
 			return sendErrorPage(500);
 		
         if (WIFEXITED(status)) {
+			if(WEXITSTATUS(status) != 0)
+				return sendErrorPage(500);
             
             headers << "Date: " << _Headers["Date"] << "\r\n"
             << "Content-Length: " << cgi_output.size() << "\r\n"
@@ -224,7 +226,7 @@ std::string Response::cgi(Request const &obj){
             return (headers.str() + cgi_output);
         }
         else
-            return sendErrorPage(500);
+            return sendErrorPage(LoopDetected);
     }
     return sendErrorPage(500);
 }
