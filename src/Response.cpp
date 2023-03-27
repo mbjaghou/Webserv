@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/27 20:37:09 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 21:01:19 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,7 @@ std::string Response::cgi(Request const &obj){
         if(waitpid(pid, &status, 0) == -1)
 			return sendErrorPage(500);
 		
-        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+        if (WIFEXITED(status)) {
             
             headers << "Date: " << _Headers["Date"] << "\r\n"
             << "Content-Length: " << cgi_output.size() << "\r\n"
