@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/27 20:15:26 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 20:40:23 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ int server::socket_server_start(void)
 		int opt = 1;
 		if ((setsockopt(server_socket , SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) < 0)
 			throw std::invalid_argument("address socket is already used");
-		fcntl(server_socket, F_SETFL, O_NONBLOCK);
+		if(fcntl(server_socket, F_SETFL, O_NONBLOCK) < 0)
+			throw std::invalid_argument(strerror(errno));
 		addr.sin_family = AF_INET;
 		addr.sin_addr.s_addr = inet_addr(it->second.c_str());
 		addr.sin_port = htons(it->first);
@@ -173,6 +174,7 @@ int server::start_server(pars pars)
     	for (i = 0; i < FD_SETSIZE; ++i)
     	{
 			int sd = accepted[i];
+			
 			int check = 0;
 			try {
 				if (sd > 0 && FD_ISSET(sd, &read_fd))
@@ -189,24 +191,24 @@ int server::start_server(pars pars)
 					}
 					Request req(tmp, pars);
 					Response res(req);
-					if (res.getStatus() != OK)
+						if (res.getStatus() != OK)
 						response[i] = res.sendErrorPage(res.getStatus());
-					else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
-						response[i] = res.uploadFile(pars, req.getReqPath());
-					else if (req.GetMethod() == "POST" && req.getLocation()->cgi_path.compare("") != 0)
-						response[i] = res.cgi(req);
-					else if (req.GetMethod() == "DELETE" && req.getLocation()->cgi_path.compare("") != 0)
-						response[i] = res.cgi(req);
-					else if (req.GetMethod() == "DELETE")
-						response[i] = res.deleteFile(req.getPath());
-					else if (!pathIsFile(req.getPath())) {
-						if (req.getLocation()->cgi_path.compare("") != 0)
-								response[i] = res.cgi(req);
+						else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
+							response[i] = res.uploadFile(pars, req.getReqPath());
+						else if (req.GetMethod() == "POST" && req.getLocation()->cgi_path.compare("") != 0)
+							response[i] = res.cgi(req);
+						else if (req.GetMethod() == "DELETE" && req.getLocation()->cgi_path.compare("") != 0)
+							response[i] = res.cgi(req);
+						else if (req.GetMethod() == "DELETE")
+							response[i] = res.deleteFile(req.getPath());
+						else if (!pathIsFile(req.getPath())) {
+							if (req.getLocation()->cgi_path.compare("") != 0)
+									response[i] = res.cgi(req);
+							else
+								response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
+						}
 						else
-							response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
-					}
-					else
-						response[i] = res.sendFile(req.getPath());
+							response[i] = res.sendFile(req.getPath());
 				}
 				if (sd > 0 && FD_ISSET(sd, &write_fd))
 				{

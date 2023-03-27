@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/27 20:13:55 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 20:37:09 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,8 +157,14 @@ std::string Response::getEnv(Request const &obj)
 	return env;
 }
 
+#include <signal.h>
+void handle_alarm(int sig) {
+	(void)sig;
+    exit(EXIT_FAILURE);
+}
 
 std::string Response::cgi(Request const &obj){
+	chdir(obj.getPath().c_str());
     std::vector<std::string> envp = ft_split(getEnv(obj), "\n");
     char **env = new char*[envp.size() + 1];
     for (size_t i = 0; i < envp.size(); ++i) {
@@ -183,6 +189,13 @@ std::string Response::cgi(Request const &obj){
     {
         dup2(pipefd[1], 1);
         close(pipefd[0]);
+		    struct sigaction sa;
+		sa.sa_handler = handle_alarm;
+		sigemptyset(&sa.sa_mask);
+		sa.sa_flags = 0;
+		sigaction(SIGALRM, &sa, NULL);
+		alarm(2);
+		
         execve(argv[0], argv, env);
         return sendErrorPage(500);
     }
