@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 12:32:18 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/26 01:06:02 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 22:47:33 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ void Request::checkMethod(const std::string &path) {
 	std::vector<std::string> methods;
 
 	for (std::size_t i = 0; i < locations.size(); ++i) {
-		if (path == locations[i].location_path) {
+		if (!strncmp(path.c_str(), locations[i].location_path.c_str(), locations[i].location_path.size())) {
 			methods = locations[i].allowed_methods;
 			break ;
 		}

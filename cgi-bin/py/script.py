@@ -1,6 +1,5 @@
 import os
 
-
 print ("Content-type: text/html\r\n\r\n")
 if os.environ['REQUEST_METHOD'] == 'POST':
     print("You sent the following data:<br>")
