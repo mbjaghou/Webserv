@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/27 14:13:16 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 20:13:55 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,6 +157,7 @@ std::string Response::getEnv(Request const &obj)
 	return env;
 }
 
+
 std::string Response::cgi(Request const &obj){
     std::vector<std::string> envp = ft_split(getEnv(obj), "\n");
     char **env = new char*[envp.size() + 1];
@@ -176,8 +177,8 @@ std::string Response::cgi(Request const &obj){
     if(pipe(pipefd) == -1)
         return sendErrorPage(500);
     pid_t pid = fork();
-    if (pid == -1)
-        return sendErrorPage(500);
+	if (pid < 0)
+		return sendErrorPage(500);
     else if(pid == 0)
     {
         dup2(pipefd[1], 1);
@@ -201,7 +202,9 @@ std::string Response::cgi(Request const &obj){
 			cgi_output = cgi_output.substr(cgi_output.find("\r\n\r\n") + 4, cgi_output.size() - cgi_output.find("\r\n\r\n") - 4);
 		}
         int status;
-        waitpid(pid, &status, 0);
+        if(waitpid(pid, &status, 0) == -1)
+			return sendErrorPage(500);
+		
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
             
             headers << "Date: " << _Headers["Date"] << "\r\n"
