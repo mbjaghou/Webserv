@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 14:23:34 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/26 22:05:20 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 21:50:40 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,6 +304,8 @@ location pars::parssing_location(std::vector<std::string> conf, size_t *count, p
 
 location pars::check_content_of_location(location loc, pars_server server)
 {
+	if (loc.count_autoindex == 0)
+		loc.autoindex = server.autoindex;
 	if (loc.root.size() == 0 && server.root.size() != 0)
 			loc.root = server.root;
 	if (loc.index.size() == 0 && server.index.size() != 0)
