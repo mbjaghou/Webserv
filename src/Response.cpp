@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/27 21:32:05 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 21:40:42 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,11 @@ void handle_alarm(int sig) {
 	(void)sig;
     exit(EXIT_FAILURE);
 }
-
+void free_env(char **env) {
+	for (size_t i = 0; env[i]; ++i)
+		delete[] env[i];
+	delete[] env;
+}
 std::string Response::cgi(Request const &obj){
 	chdir(obj.getPath().c_str());
     std::vector<std::string> envp = ft_split(getEnv(obj), "\n");
@@ -172,17 +176,31 @@ std::string Response::cgi(Request const &obj){
     env[envp.size()] = NULL;
     std::string cgi_path = obj.getLocation()->cgi_path;
     std::string cgi_script = obj.getLocation()->cgi_script;
-    if(access(cgi_script.c_str(), F_OK) == -1 || access(cgi_path.c_str(), X_OK) == -1)
-        return sendErrorPage(500);
+    if(access(cgi_script.c_str(), X_OK) == -1)
+	{
+		free_env(env);
+        return sendErrorPage(Forbidden);
+	}
+	if(access(cgi_path.c_str(), F_OK) == -1)
+	{
+		free_env(env);
+		return sendErrorPage(NotFound);
+	}
     char* argv[] = {const_cast<char*>(cgi_path.c_str()), const_cast<char *>(cgi_script.c_str()), NULL};
 	int pipefd[2];
     std::ostringstream	headers;
 	headers << "HTTP/1.1 200 OK\r\n";
     if(pipe(pipefd) == -1)
-        return sendErrorPage(500);
+	{
+		free_env(env);
+        return sendErrorPage(InternalServerError);
+	}
     pid_t pid = fork();
 	if (pid < 0)
-		return sendErrorPage(500);
+	{
+		free_env(env);
+		return sendErrorPage(InternalServerError);
+	}
     else if(pid == 0)
     {
         dup2(pipefd[1], 1);
@@ -199,7 +217,7 @@ std::string Response::cgi(Request const &obj){
 			delete[] env[i];
 		}
 		delete[] env;
-        return sendErrorPage(500);
+        return sendErrorPage(InternalServerError);
     }
     else
     {
@@ -222,11 +240,11 @@ std::string Response::cgi(Request const &obj){
 		}
         int status;
         if(waitpid(pid, &status, 0) == -1)
-			return sendErrorPage(500);
+			return sendErrorPage(InternalServerError);
 		
         if (WIFEXITED(status)) {
 			if(WEXITSTATUS(status) != 0)
-				return sendErrorPage(500);
+				return sendErrorPage(InternalServerError);
             
             headers << "Date: " << _Headers["Date"] << "\r\n"
             << "Content-Length: " << cgi_output.size() << "\r\n"
@@ -236,7 +254,7 @@ std::string Response::cgi(Request const &obj){
         else
             return sendErrorPage(LoopDetected);
     }
-    return sendErrorPage(500);
+    return "";
 }
 
 std::string Response::sendHeaders(const std::string &filename) {
