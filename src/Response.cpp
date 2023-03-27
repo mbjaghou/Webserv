@@ -6,7 +6,7 @@
 /*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/27 21:01:19 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 21:04:48 by yachehbo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,6 @@ std::string Response::getEnv(Request const &obj)
 			}
 		}
 	}
-	if (obj.GetMethod() == "DELETE")
-		env.append("REQUEST_METHOD=DELETE\n");
 	env.append("");
 	return env;
 }
