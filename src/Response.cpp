@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mbjaghou <mbjaghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:16:38 by ylabtaim          #+#    #+#             */
-/*   Updated: 2023/03/27 21:40:42 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/27 21:42:44 by mbjaghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,18 +213,12 @@ std::string Response::cgi(Request const &obj){
 		alarm(2);
 		
         execve(argv[0], argv, env);
-		for (size_t i = 0; i < envp.size(); ++i) {
-			delete[] env[i];
-		}
-		delete[] env;
+		free_env(env);
         return sendErrorPage(InternalServerError);
     }
     else
     {
-		for (size_t i = 0; i < envp.size(); ++i) {
-			delete[] env[i];
-		}
-		delete[] env;
+		free_env(env);
         close(pipefd[1]);
         std::string cgi_output;
         char buffer[1024];
