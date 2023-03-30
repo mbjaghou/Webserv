@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yachehbo <yachehbo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ylabtaim <ylabtaim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 17:22:52 by mbjaghou          #+#    #+#             */
-/*   Updated: 2023/03/27 20:40:23 by yachehbo         ###   ########.fr       */
+/*   Updated: 2023/03/29 23:59:17 by ylabtaim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,24 +191,24 @@ int server::start_server(pars pars)
 					}
 					Request req(tmp, pars);
 					Response res(req);
-						if (res.getStatus() != OK)
+					if (res.getStatus() != OK)
 						response[i] = res.sendErrorPage(res.getStatus());
-						else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
-							response[i] = res.uploadFile(pars, req.getReqPath());
-						else if (req.GetMethod() == "POST" && req.getLocation()->cgi_path.compare("") != 0)
-							response[i] = res.cgi(req);
-						else if (req.GetMethod() == "DELETE" && req.getLocation()->cgi_path.compare("") != 0)
-							response[i] = res.cgi(req);
-						else if (req.GetMethod() == "DELETE")
-							response[i] = res.deleteFile(req.getPath());
-						else if (!pathIsFile(req.getPath())) {
-							if (req.getLocation()->cgi_path.compare("") != 0)
-									response[i] = res.cgi(req);
-							else
-								response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
-						}
+					else if (req.GetMethod() == "POST" && tmp.find("Content-Disposition") != std::string::npos)	
+						response[i] = res.uploadFile(pars, req.getReqPath());
+					else if (req.GetMethod() == "POST" && req.getLocation()->cgi_path.compare("") != 0)
+						response[i] = res.cgi(req);
+					else if (req.GetMethod() == "DELETE" && req.getLocation()->cgi_path.compare("") != 0)
+						response[i] = res.cgi(req);
+					else if (req.GetMethod() == "DELETE")
+						response[i] = res.deleteFile(req.getPath());
+					else if (!pathIsFile(req.getPath())) {
+						if (req.getLocation() && req.getLocation()->cgi_path.compare("") != 0)
+								response[i] = res.cgi(req);
 						else
-							response[i] = res.sendFile(req.getPath());
+							response[i] = res.sendDir(req.getPath().c_str(), req.getHost());
+					}
+					else
+						response[i] = res.sendFile(req.getPath());
 				}
 				if (sd > 0 && FD_ISSET(sd, &write_fd))
 				{
